@@ -1,0 +1,24 @@
+# Nothing is guessed: a line whose quantity times price is not its amount, a
+# line that cannot be read, and a total that does not add up are all problems.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: c.pdf
+        method: ocr
+        pages:
+          - "Harbor Freight Logistics\nInvoice No:  INV-2026-1046\nDescription  Qty  Unit Price  Amount\nPallet shipping, zone 2  9  24.90  149.40\nCustoms handling fee  35.00  35.00\nSubtotal:  184.40\nTax (8%):  14.75\nTotal:  209.15"
+        page_methods: [ocr]
+expect:
+  records:
+    - file: c.pdf
+      method: ocr
+      fields: {vendor: Harbor Freight Logistics, customer: null, invoice_number: INV-2026-1046, invoice_date: null, subtotal: "184.40", tax: "14.75", total: "209.15"}
+      line_items:
+        - {description: "Pallet shipping, zone 2", quantity: 9, unit_price: "24.90", amount: "149.40"}
+      problems:
+        - "invoice_date: not found"
+        - "line 'Pallet shipping, zone 2': 9 x 24.90 is not 149.40"
+        - "line not read: 'Customs handling fee  35.00  35.00'"
+        - "line items add up to 149.40, subtotal is 184.40"
+        - "subtotal 184.40 + tax 14.75 is 199.15, total is 209.15"

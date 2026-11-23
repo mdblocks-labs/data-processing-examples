@@ -1,0 +1,19 @@
+# A file `read` could not open (here a password-protected PDF) becomes one
+# record in review with the reason, so the rest of the folder still goes on.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: locked.pdf
+        method: unreadable
+        pages: []
+        page_methods: []
+        error: "PdfiumError: Failed to load document (PDFium: Incorrect password error)."
+expect:
+  records:
+    - file: locked.pdf
+      method: unreadable
+      fields: {vendor: null, customer: null, invoice_number: null, invoice_date: null, subtotal: null, tax: null, total: null}
+      line_items: []
+      problems:
+        - "file not read: PdfiumError: Failed to load document (PDFium: Incorrect password error)."

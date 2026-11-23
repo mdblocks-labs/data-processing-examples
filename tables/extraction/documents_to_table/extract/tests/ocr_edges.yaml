@@ -1,0 +1,27 @@
+# OCR edge cases. A split label keeps its value's spaces; a split identifier is
+# a problem, not a guess; a blank value is missing; an item whose quantity was
+# dropped is not read as "Zone" x 1; an amount too large for the tables is a
+# problem rather than a crash.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: f.png
+        method: ocr
+        pages:
+          - "Harbor Freight Logistics\nCust omer:  Northwind Office Supply\nInvoice No:  INV- 1234\nInvoice Date:  \nDescription  Qty  Unit Price  Amount\nPallet zone 1  10.00  10.00\nCrate  2  5.00  10.00\nSubtotal:  20.00\nTax (8%):  1.60\nTotal:  10,000,000,000.00"
+        page_methods: [ocr]
+expect:
+  records:
+    - file: f.png
+      method: ocr
+      fields: {vendor: Harbor Freight Logistics, customer: Northwind Office Supply, invoice_number: null, invoice_date: null, subtotal: "20.00", tax: "1.60", total: null}
+      line_items:
+        - {description: Crate, quantity: 2, unit_price: "5.00", amount: "10.00"}
+      problems:
+        - "invoice_number: OCR split 'INV- 1234'"
+        - "invoice_number: not found"
+        - "invoice_date: not found"
+        - "total: cannot read '10,000,000,000.00' as money"
+        - "line not read, a column is missing: 'Pallet zone 1  10.00  10.00'"
+        - "totals not checked: total not read"

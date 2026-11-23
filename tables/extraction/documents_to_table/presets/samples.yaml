@@ -1,0 +1,7 @@
+# The bundled sample invoices and the default schema. Paths in `in:` resolve
+# against this file's directory; `folder` is read from the workflow folder.
+in:
+  schema: ../schema.json
+params:
+  folder: samples/invoices
+runner: local

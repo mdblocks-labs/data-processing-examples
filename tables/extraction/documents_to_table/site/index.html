@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Invoices from a folder</title>
+  <link rel="stylesheet" href="mdb.css" />
+  <script src="mdb.js"></script>
+  <style>
+    /* Layout only; every colour is a token from `mdb.css`. */
+    .kpis { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .kpi .name { font-size: 12px; color: var(--mdb-text-muted); }
+    .kpi .value { font-size: 24px; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+<main class="mdb-site">
+  <h1>Invoices from a folder</h1>
+  <p class="mdb-prov" id="page"></p>
+
+  <div class="kpis" id="kpis"></div>
+
+  <h2>Needs a look</h2>
+  <p class="mdb-prov" data-prov="assemble.review"></p>
+  <div data-value="assemble.review"></div>
+
+  <h2>Invoices</h2>
+  <p class="mdb-prov" data-prov="assemble.invoices"></p>
+  <div data-value="assemble.invoices"></div>
+</main>
+<script type="module">
+  /// <reference path="mdb.d.ts" />
+  const at = (id) => document.getElementById(id);
+  const el = (tag, props) => Object.assign(document.createElement(tag), props);
+
+  const absent = (node, endpoint, err) => {
+    node.className = "mdb-absent";
+    node.textContent = err.absent
+      ? `${endpoint}: no value — ${err.absent}${err.reason ? ` (${err.reason})` : ""}`
+      : `${endpoint}: ${err.message}`;
+  };
+
+  const kpi = (name, value) => {
+    const card = el("div", { className: "kpi mdb-card" });
+    card.append(el("div", { className: "name", textContent: name }), el("div", { className: "value", textContent: value }));
+    return card;
+  };
+
+  async function drawCounts() {
+    try {
+      const { columns, rows } = await mdb.table("assemble.invoices");
+      const col = (name) => columns.indexOf(name);
+      const lines = rows.reduce((sum, row) => sum + Number(row[col("line_items")] ?? 0), 0);
+      const review = rows.filter((row) => row[col("needs_review")]).length;
+      at("kpis").replaceChildren(
+        kpi("Invoices", rows.length),
+        kpi("Line items", lines),
+        kpi("Need a look", review),
+      );
+    } catch (err) {
+      absent(at("kpis"), "assemble.invoices", err);
+    }
+  }
+
+  async function draw() {
+    const { manifest } = mdb;
+    // A `--no-values` copy carries no runs, so "never run" would be wrong there.
+    const withheld = mdb.entry("assemble.invoices").reason === "--no-values";
+    at("page").textContent = withheld ? "No recorded values in this copy" : [
+      `${manifest.runs.length} run${manifest.runs.length === 1 ? "" : "s"}`,
+      manifest.asOf ? `as of ${manifest.asOf}` : "never run",
+    ].join(" · ");
+    await Promise.all([mdb.bind(), drawCounts()]);
+  }
+
+  // A finished run reloads the page, so every draw starts from a fresh page.
+  try {
+    await mdb.ready();
+    mdb.on("change", () => location.reload());
+    await mdb.ready(); // again, now subscribed, so a run that finished meanwhile is drawn
+  } catch (err) {
+    at("page").textContent = `Can't read the runs: ${err.message}. Reload to try again.`;
+    throw err;
+  }
+  await draw();
+</script>
+</body>
+</html>

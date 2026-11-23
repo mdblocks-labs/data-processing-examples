@@ -1,0 +1,24 @@
+# A digital page beside a blank page that was OCR'd keeps its single-spaced
+# items; a total with a digit past the cents is not read as the cents; a
+# quantity too large for the tables is a problem rather than a crash.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: g.pdf
+        method: ocr+text
+        pages:
+          - "Acme Supply\nInvoice No: INV-7\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nCrate 2 5.00 10.00\nPin 2147483648 0.01 21474836.48\nSubtotal: 10.00\nTax (0%): 0.00\nTotal: 10.009"
+          - ""
+        page_methods: [text, ocr]
+expect:
+  records:
+    - file: g.pdf
+      method: ocr+text
+      fields: {vendor: Acme Supply, customer: null, invoice_number: INV-7, invoice_date: "2026-09-01", subtotal: "10.00", tax: "0.00", total: null}
+      line_items:
+        - {description: Crate, quantity: 2, unit_price: "5.00", amount: "10.00"}
+      problems:
+        - "total: cannot read '10.009' as money"
+        - "line not read, the quantity is not a whole number in range: 'Pin 2147483648 0.01 21474836.48'"
+        - "totals not checked: total not read"

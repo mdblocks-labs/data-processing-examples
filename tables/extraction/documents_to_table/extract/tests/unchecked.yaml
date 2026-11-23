@@ -1,0 +1,37 @@
+# Values that would otherwise pass unchecked: an unreadable subtotal, an
+# invoice number OCR split into two boxes, a first line that is an invoice
+# label rather than the vendor, and an amount with a third decimal.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: h.png
+        method: ocr
+        pages:
+          - "Invoice No:  INV-20  26\nInvoice Date:  2026-09-01\nDescription  Qty  Unit Price  Amount\nCrate  2  5.00  10.00\nSubtotal:  10.009\nTax (0%):  0.00\nTotal:  90.00"
+        page_methods: [ocr]
+    - - file: i.pdf
+        method: text
+        pages:
+          - "INVOICE\nAcme Supply\nInvoice No: INV-9\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nCrate 1 10.004 10.00\nSubtotal: 10.00\nTax (0%): 0.00\nTotal: 10.00"
+        page_methods: [text]
+expect:
+  records:
+    - file: h.png
+      method: ocr
+      fields: {vendor: null, customer: null, invoice_number: null, invoice_date: "2026-09-01", subtotal: null, tax: "0.00", total: "90.00"}
+      line_items:
+        - {description: Crate, quantity: 2, unit_price: "5.00", amount: "10.00"}
+      problems:
+        - "vendor: not found"
+        - "invoice_number: not found"
+        - "subtotal: cannot read '10.009' as money"
+        - "totals not checked: subtotal not read"
+    - file: i.pdf
+      method: text
+      fields: {vendor: null, customer: null, invoice_number: INV-9, invoice_date: "2026-09-01", subtotal: "10.00", tax: "0.00", total: "10.00"}
+      line_items: []
+      problems:
+        - "vendor: not found"
+        - "line not read: 'Crate 1 10.004 10.00'"
+        - "line items add up to 0.00, subtotal is 10.00"

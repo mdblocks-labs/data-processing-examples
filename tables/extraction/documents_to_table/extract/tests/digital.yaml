@@ -1,0 +1,19 @@
+# A page read from a PDF text layer: single spaces, every value present.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: a.pdf
+        method: text
+        pages:
+          - "Northwind Office Supply\nInvoice No: INV-2026-1040\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nToner cartridge black 2 68.00 136.00\nDesk chair, ergonomic 1 1,189.99 1,189.99\nSubtotal: 1,325.99\nTax (8%): 106.08\nTotal: 1,432.07"
+        page_methods: [text]
+expect:
+  records:
+    - file: a.pdf
+      method: text
+      fields: {vendor: Northwind Office Supply, customer: null, invoice_number: INV-2026-1040, invoice_date: "2026-09-01", subtotal: "1325.99", tax: "106.08", total: "1432.07"}
+      line_items:
+        - {description: Toner cartridge black, quantity: 2, unit_price: "68.00", amount: "136.00"}
+        - {description: "Desk chair, ergonomic", quantity: 1, unit_price: "1189.99", amount: "1189.99"}
+      problems: []

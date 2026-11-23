@@ -1,0 +1,37 @@
+# Summary amounts come only from their own rows below the items: an item named
+# "Tax filing: 9.00" or "Tax prep: 0.00 deposit" does not supply the tax. An
+# unreadable tax leaves the totals unchecked, which is a problem. A split label
+# is not a vendor. "1,0.00" is not an amount.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: j.pdf
+        method: text
+        pages:
+          - "Acme Supply\nInvoice No: INV-11\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nTax filing: 9.00\nTax prep: 0.00 deposit\nCrate 1 10.00 10.00\nSubtotal: 10.00\nTax (8%): 0.80\nTotal: 10.80"
+        page_methods: [text]
+    - - file: k.png
+        method: ocr
+        pages:
+          - "Inv oice No:  INV-1\nInvoice Date:  2026-09-01\nDescription  Qty  Unit Price  Amount\nCrate  1  1,0.00  1,0.00\nSubtotal:  10.00\nTax (8%):  0.809\nTotal:  90.00"
+        page_methods: [ocr]
+expect:
+  records:
+    - file: j.pdf
+      method: text
+      fields: {vendor: Acme Supply, customer: null, invoice_number: INV-11, invoice_date: "2026-09-01", subtotal: "10.00", tax: "0.80", total: "10.80"}
+      line_items:
+        - {description: Crate, quantity: 1, unit_price: "10.00", amount: "10.00"}
+      problems:
+        - "line not read: 'Tax filing: 9.00'"
+        - "line not read: 'Tax prep: 0.00 deposit'"
+    - file: k.png
+      method: ocr
+      fields: {vendor: null, customer: null, invoice_number: INV-1, invoice_date: "2026-09-01", subtotal: "10.00", tax: null, total: "90.00"}
+      line_items: []
+      problems:
+        - "vendor: not found"
+        - "tax: cannot read '0.809' as money"
+        - "line not read, an amount is malformed or too large: 'Crate  1  1,0.00  1,0.00'"
+        - "totals not checked: tax not read"

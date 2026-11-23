@@ -1,0 +1,22 @@
+# The items end only at a complete subtotal row, so an item described as
+# "Subtotal: audit" is still an item; with the printed totals at zero, the
+# items it would have hidden make the invoice go to review.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: n.pdf
+        method: text
+        pages:
+          - "Acme Supply\nInvoice No: INV-14\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nSubtotal: audit 1 20.00 20.00\nCrate 1 30.00 30.00\nSubtotal: 0.00\nTax: 0.00\nTotal: 0.00"
+        page_methods: [text]
+expect:
+  records:
+    - file: n.pdf
+      method: text
+      fields: {vendor: Acme Supply, customer: null, invoice_number: INV-14, invoice_date: "2026-09-01", subtotal: "0.00", tax: "0.00", total: "0.00"}
+      line_items:
+        - {description: "Subtotal: audit", quantity: 1, unit_price: "20.00", amount: "20.00"}
+        - {description: Crate, quantity: 1, unit_price: "30.00", amount: "30.00"}
+      problems:
+        - "line items add up to 50.00, subtotal is 0.00"

@@ -1,0 +1,48 @@
+# The summary is found from the subtotal row even when OCR splits the item
+# header, so an item named "Tax filing: 9.00" never supplies the tax; a
+# "Taxable amount" row is not the tax row; a quantity that is not a short run
+# of ASCII digits is a problem on its line, never a crash. A "Tax:" line above
+# the items is never the tax either: the schema can't widen where totals are read.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: l.png
+        method: ocr
+        pages:
+          - "Acme Supply\nInvoice No:  INV-12\nInvoice Date:  2026-09-01\nDescript ion  Qty  Unit Price  Amount\nTax filing: 9.00\nSubtotal:  0.00\nTax:  0.00\nTotal:  9.00"
+        page_methods: [ocr]
+    - - file: m.pdf
+        method: text
+        pages:
+          - "Acme Supply\nInvoice No: INV-13\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nCrate 1 10.00 10.00\nWidget 12345678901 0.00 0.00\nSubtotal: 10.00\nTaxable amount: 10.00\nTax (8%): 0.80\nTotal: 20.00"
+        page_methods: [text]
+    - - file: n.pdf
+        method: text
+        pages:
+          - "Acme Supply\nInvoice No: INV-14\nInvoice Date: 2026-09-01\nTax: 9.00\nDescription Qty Unit Price Amount\nCrate 1 10.00 10.00\nSubtotal: 10.00\nTax: 0.80\nTotal: 19.00"
+        page_methods: [text]
+expect:
+  records:
+    - file: l.png
+      method: ocr
+      fields: {vendor: Acme Supply, customer: null, invoice_number: INV-12, invoice_date: "2026-09-01", subtotal: "0.00", tax: "0.00", total: "9.00"}
+      line_items: []
+      problems:
+        - "item header not found, so no line items were read"
+        - "subtotal 0.00 + tax 0.00 is 0.00, total is 9.00"
+    - file: m.pdf
+      method: text
+      fields: {vendor: Acme Supply, customer: null, invoice_number: INV-13, invoice_date: "2026-09-01", subtotal: "10.00", tax: "0.80", total: "20.00"}
+      line_items:
+        - {description: Crate, quantity: 1, unit_price: "10.00", amount: "10.00"}
+      problems:
+        - "line not read, the quantity is not a whole number in range: 'Widget 12345678901 0.00 0.00'"
+        - "subtotal 10.00 + tax 0.80 is 10.80, total is 20.00"
+    - file: n.pdf
+      method: text
+      fields: {vendor: Acme Supply, customer: null, invoice_number: INV-14, invoice_date: "2026-09-01", subtotal: "10.00", tax: "0.80", total: "19.00"}
+      line_items:
+        - {description: Crate, quantity: 1, unit_price: "10.00", amount: "10.00"}
+      problems:
+        - "subtotal 10.00 + tax 0.80 is 10.80, total is 19.00"

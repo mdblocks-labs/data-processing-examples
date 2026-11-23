@@ -1,0 +1,46 @@
+{
+  "fields": {
+    "vendor": {
+      "pattern": "\\A\\s*(.+)",
+      "reject": "(?i)^invoice",
+      "required": true
+    },
+    "invoice_number": {
+      "pattern": "Invoice[ \\t]*(?:No\\.?|Number)[ \\t]*:?[ \\t]*([A-Z0-9](?:[A-Z0-9-]*[A-Z0-9])?)(?=[ \\t]*$)",
+      "required": true
+    },
+    "invoice_date": {
+      "pattern": "Invoice[ \\t]*Date[ \\t]*:?[ \\t]*(.+?)[ \\t]*$",
+      "type": "date",
+      "required": true
+    },
+    "due_date": {
+      "pattern": "Due[ \\t]*Date[ \\t]*:?[ \\t]*(.+?)[ \\t]*$",
+      "type": "date"
+    },
+    "currency": {
+      "pattern": "Currency[ \\t]*:?[ \\t]*([A-Z]{3})\\b"
+    },
+    "subtotal": {
+      "pattern": "^[ \\t]*Sub[ \\t]*total[ \\t]*:?[ \\t]*\\$?[ \\t]*([\\d.,]+)[ \\t]*$"
+    },
+    "tax": {
+      "pattern": "^[ \\t]*Tax(?:[ \\t]*\\([^)\\n]*\\))?[ \\t]*:[ \\t]*\\$?[ \\t]*([\\d.,]+)[ \\t]*$"
+    },
+    "total": {
+      "pattern": "^[ \\t]*Total[ \\t]*:?[ \\t]*\\$?[ \\t]*([\\d.,]+)[ \\t]*$"
+    }
+  },
+  "date_formats": [
+    "%Y-%m-%d",
+    "%d %b %Y",
+    "%B %d, %Y",
+    "%b %d, %Y",
+    "%d/%m/%Y"
+  ],
+  "line_items": {
+    "start": "Description",
+    "end": "^[ \\t]*Sub[ \\t]*total[ \\t]*:?[ \\t]*\\$?[ \\t]*[\\d.,]+[ \\t]*$",
+    "pattern": "^(?P<description>.+?)\\s+(?P<quantity>\\d+)\\s+(?P<unit_price>[\\d,]+\\.\\d{2})\\s+(?P<amount>[\\d,]+\\.\\d{2})\\s*$"
+  }
+}

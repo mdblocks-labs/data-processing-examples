@@ -1,0 +1,5 @@
+{"type":"node","id":"assemble","x":48,"y":562}
+{"type":"node","id":"collect","x":48,"y":88}
+{"type":"node","id":"export","x":48,"y":720}
+{"type":"node","id":"extract","x":48,"y":404}
+{"type":"node","id":"per_document","x":48,"y":246}

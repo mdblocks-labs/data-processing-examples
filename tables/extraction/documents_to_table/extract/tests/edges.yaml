@@ -1,0 +1,31 @@
+# A blank field does not borrow the next line; an item named like the subtotal
+# is still an item; and a subtotal with no items is a problem.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: d.pdf
+        method: text
+        pages:
+          - "Acme Supply\nInvoice No:\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nSubtotal audit 1 10.00 10.00\nSubtotal: 10.00\nTax (8%): 0.80\nTotal: 10.80"
+        page_methods: [text]
+    - - file: e.pdf
+        method: text
+        pages:
+          - "Acme Supply\nInvoice No: INV-1\nInvoice Date: 2026-09-01\nDescription Qty Unit Price Amount\nSubtotal: 10.00\nTax (8%): 0.80\nTotal: 10.80"
+        page_methods: [text]
+expect:
+  records:
+    - file: d.pdf
+      method: text
+      fields: {vendor: Acme Supply, customer: null, invoice_number: null, invoice_date: "2026-09-01", subtotal: "10.00", tax: "0.80", total: "10.80"}
+      line_items:
+        - {description: Subtotal audit, quantity: 1, unit_price: "10.00", amount: "10.00"}
+      problems:
+        - "invoice_number: not found"
+    - file: e.pdf
+      method: text
+      fields: {vendor: Acme Supply, customer: null, invoice_number: INV-1, invoice_date: "2026-09-01", subtotal: "10.00", tax: "0.80", total: "10.80"}
+      line_items: []
+      problems:
+        - "line items add up to 0.00, subtotal is 10.00"

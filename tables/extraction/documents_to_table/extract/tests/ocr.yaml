@@ -1,0 +1,19 @@
+# An OCR'd page: columns joined by two spaces, a label split ("D ate") and a
+# date run together ("October27,2026"). Both are still read.
+mdblocks: 1
+given:
+  schema: "@schema.json"
+  text:
+    - - file: b.png
+        method: ocr
+        pages:
+          - "Juniper Design Studio\nBill To: Acme  Invoice Number:  INV-2026-1043\nInvoice D ate:  October27,2026\nDescription  Qty  Unit Price  Amount\nLogo design revision  2  220.00  440.00\nSubtotal:  440.00\nTax (8%):  35.20\nTotal:  475.20"
+        page_methods: [ocr]
+expect:
+  records:
+    - file: b.png
+      method: ocr
+      fields: {vendor: Juniper Design Studio, customer: null, invoice_number: INV-2026-1043, invoice_date: "2026-10-27", subtotal: "440.00", tax: "35.20", total: "475.20"}
+      line_items:
+        - {description: Logo design revision, quantity: 2, unit_price: "220.00", amount: "440.00"}
+      problems: []

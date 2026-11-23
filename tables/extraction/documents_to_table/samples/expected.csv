@@ -1,0 +1,10 @@
+file,vendor,invoice_number,invoice_date,due_date,currency,subtotal,tax,total,line_items,total_is_wrong
+01-northwind.pdf,Northwind Office Supply,INV-2026-1040,2026-09-01,2026-10-01,USD,3439.94,275.20,3715.14,3,false
+02-bluebird.pdf,Bluebird Cloud Services,INV-2026-1041,2026-09-08,2026-10-08,USD,1016.00,81.28,1097.28,2,false
+03-harbor.pdf,Harbor Freight Logistics,INV-2026-1042,2026-09-15,2026-10-15,USD,649.00,51.92,700.92,2,false
+04-juniper-scan.pdf,Juniper Design Studio,INV-2026-1043,2026-09-22,2026-10-22,USD,1083.40,86.67,1170.07,3,false
+05-northwind.pdf,Northwind Office Supply,INV-2026-1044,2026-09-29,2026-10-29,USD,2130.00,170.40,2300.40,2,false
+06-bluebird.pdf,Bluebird Cloud Services,INV-2026-1045,2026-10-06,2026-11-05,USD,1935.00,154.80,2099.80,3,true
+07-harbor.pdf,Harbor Freight Logistics,INV-2026-1046,2026-10-13,2026-11-12,USD,254.70,20.38,275.08,2,false
+08-juniper-scan.pdf,Juniper Design Studio,INV-2026-1047,2026-10-20,2026-11-19,USD,525.50,42.04,567.54,2,false
+09-northwind-photo.png,Northwind Office Supply,INV-2026-1048,2026-10-27,2026-11-26,USD,1825.50,146.04,1971.54,2,false
