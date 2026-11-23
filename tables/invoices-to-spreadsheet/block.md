@@ -17,7 +17,7 @@ ports:
 field: Data processing / Tables / Extraction
 ---
 
-# documents_to_table
+# invoices-to-spreadsheet
 
 **Turn a folder of invoices, PDFs or scans, into one spreadsheet.** Each file
 is read once: a digital PDF from its text layer, a scan or photo by OCR on your
@@ -62,7 +62,7 @@ export.workbook     -> @out.workbook
 ## Try it
 
 ```sh
-mdb run tables/extraction/documents_to_table --preset tables/extraction/documents_to_table/presets/samples.yaml
+mdb run tables/invoices-to-spreadsheet --preset tables/invoices-to-spreadsheet/presets/samples.yaml
 ```
 
 The [samples](samples/) are nine invented invoices: six digital PDFs, two scans
@@ -72,6 +72,6 @@ and a phone photo. One has a total that doesn't add up, so it lands in
 patterns in `schema.json`.
 
 To see the results, open the folder in `mdb ui` and pick the Site tab, or
-build a static copy with `mdb site build tables/extraction/documents_to_table -o out`. The
+build a static copy with `mdb site build tables/invoices-to-spreadsheet -o out`. The
 page shows the counts, the review list and every invoice; the workbook is the
 `workbook` output.
