@@ -1,0 +1,52 @@
+Lead ID,Created,UTM Campaign,Stage,Deal ID
+L-AP00001,10/16/2026 10:00,Search - Brand,Closed Won,D-AP0001
+L-AP00002,10/16/2026 15:30,Search - Brand,Qualified,
+L-AP00003,10/16/2026 15:30,Search - Brand,Lost,
+L-AP00004,10/17/2026 10:07,Search - Brand,Closed Won,D-AP0002
+L-AP00005,10/17/2026 15:30,Search - Brand,Qualified,
+L-AP00006,10/17/2026 15:30,Search - Brand,Lost,
+L-AP00007,10/18/2026 10:14,Search - Brand,Closed Won,D-AP0003
+L-AP00008,10/18/2026 15:30,Search - Brand,Qualified,
+L-AP00009,10/18/2026 15:30,Search - Brand,Lost,
+L-AP00010,10/19/2026 10:21,Search - Brand,Closed Won,D-AP0004
+L-AP00011,10/19/2026 15:30,Search - Brand,Qualified,
+L-AP00012,10/19/2026 15:30,Search - Brand,Lost,
+L-AP00013,10/16/2026 10:00,Search - Tents,Closed Won,D-AP0005
+L-AP00014,10/16/2026 15:30,Search - Tents,Qualified,
+L-AP00015,10/16/2026 15:30,Search - Tents,Lost,
+L-AP00016,10/17/2026 10:07,Search - Tents,Closed Won,D-AP0006
+L-AP00017,10/17/2026 15:30,Search - Tents,Qualified,
+L-AP00018,10/17/2026 15:30,Search - Tents,Lost,
+L-AP00019,10/18/2026 10:14,Search - Tents,Closed Won,D-AP0007
+L-AP00020,10/18/2026 15:30,Search - Tents,Qualified,
+L-AP00021,10/18/2026 15:30,Search - Tents,Lost,
+L-AP00022,10/16/2026 10:00,Shopping - Boots,Closed Won,D-AP0008
+L-AP00023,10/16/2026 15:30,Shopping - Boots,Qualified,
+L-AP00024,10/16/2026 15:30,Shopping - Boots,Lost,
+L-AP00025,10/17/2026 10:07,Shopping - Boots,Closed Won,D-AP0009
+L-AP00026,10/17/2026 15:30,Shopping - Boots,Qualified,
+L-AP00027,10/17/2026 15:30,Shopping - Boots,Lost,
+L-AP00028,10/18/2026 10:14,Shopping - Boots,Closed Won,D-AP0010
+L-AP00029,10/18/2026 15:30,Shopping - Boots,Qualified,
+L-AP00030,10/18/2026 15:30,Shopping - Boots,Lost,
+L-AP00031,10/19/2026 10:21,Shopping - Boots,Closed Won,D-AP0011
+L-AP00032,10/19/2026 15:30,Shopping - Boots,Qualified,
+L-AP00033,10/19/2026 15:30,Shopping - Boots,Lost,
+L-AP00034,10/16/2026 10:00,Prospecting - Spring,Closed Won,D-AP0012
+L-AP00035,10/16/2026 15:30,Prospecting - Spring,Qualified,
+L-AP00036,10/16/2026 15:30,Prospecting - Spring,Lost,
+L-AP00037,10/16/2026 10:00,Retargeting - Cart,Closed Won,D-AP0013
+L-AP00038,10/16/2026 15:30,Retargeting - Cart,Qualified,
+L-AP00039,10/16/2026 15:30,Retargeting - Cart,Lost,
+L-AP00040,10/17/2026 10:07,Retargeting - Cart,Closed Won,D-AP0014
+L-AP00041,10/17/2026 15:30,Retargeting - Cart,Qualified,
+L-AP00042,10/17/2026 15:30,Retargeting - Cart,Lost,
+L-AP00043,10/18/2026 10:14,Retargeting - Cart,Closed Won,D-AP0015
+L-AP00044,10/18/2026 15:30,Retargeting - Cart,Qualified,
+L-AP00045,10/18/2026 15:30,Retargeting - Cart,Lost,
+L-AP00046,10/19/2026 10:21,Retargeting - Cart,Closed Won,D-AP0016
+L-AP00047,10/19/2026 15:30,Retargeting - Cart,Qualified,
+L-AP00048,10/19/2026 15:30,Retargeting - Cart,Lost,
+L-AP00049,10/17/2026 10:28,Retargeting - Cart,Closed Won,D-AP0017
+L-AP00050,10/17/2026 15:30,Retargeting - Cart,Qualified,
+L-AP00051,10/17/2026 15:30,Retargeting - Cart,Lost,

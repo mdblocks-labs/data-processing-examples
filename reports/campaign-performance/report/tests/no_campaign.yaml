@@ -1,0 +1,120 @@
+# A won lead with no campaign: its sale counts in the client's qualified sales and
+# margin but in no campaign, and the lead is listed.
+mdblocks: 1
+given:
+  files:
+  - - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-28', Brand, '100.00', USD]
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - [L1, '2026-11-25', Brand, Won, D1]
+      - [L2, '2026-11-25', '', Won, D2]
+      error: null
+  - - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O1, D1, '2026-11-26', '200.00', '100.00', '0.00', USD]
+      - [O2, D2, '2026-11-27', '300.00', '100.00', '0.00', USD]
+      error: null
+  - - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [date, currency, rate]
+      rows:
+      - ['2026-11-01', EUR, '1.10']
+      - ['2026-11-10', EUR, '1.20']
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: null
+params:
+  week_ending: '2026-11-28'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-11-28'
+    period_start: '2026-11-01'
+    totals:
+      spend: '100.00'
+      sales: 2
+      cost_per_sale: '50.00'
+      margin: '300.00'
+      margin_after_spend: '200.00'
+      unattributed_margin: '0.00'
+    campaigns:
+    - campaign: Brand
+      spend: '100.00'
+      sales: 1
+      cost_per_sale: '100.00'
+      margin: '100.00'
+      margin_after_spend: '0.00'
+      recommendation: hold
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '100.00'
+        sales: 1
+        margin: '100.00'
+    files:
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 2
+      first: '2026-11-25'
+      last: '2026-11-25'
+      totals: {}
+    - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 1
+      first: '2026-11-28'
+      last: '2026-11-28'
+      totals:
+        USD: '100.00'
+    - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: rates
+      rows: 2
+      first: '2026-11-01'
+      last: '2026-11-10'
+      totals: {}
+    - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 2
+      first: '2026-11-26'
+      last: '2026-11-27'
+      totals:
+        USD: '500.00'
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'meta: no file in the folder matches its headers'
+    - file: crm.csv
+      row: 3
+      problem: won lead with no campaign; its sale counts in the totals only
+    checksum: e56c6140545d07a8835c4929e35e961995f1786022556852f079f4807c23608c

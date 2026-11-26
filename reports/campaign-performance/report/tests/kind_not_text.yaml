@@ -1,0 +1,13 @@
+# A source whose kind is a list, not one of the kind names, stops the run, naming the
+# source and field.
+mdblocks: 1
+given:
+  files: []
+  sources:
+    google: {kind: [spend], columns: {date: Day, campaign: Campaign, spend: Cost, currency: Currency}, date_format: "%Y-%m-%d"}
+  client: {name: Test Co, currency: USD, target_cost_per_sale: "100.00"}
+  previous: null
+params:
+  week_ending: "2026-11-28"
+expect_state: failed
+expect_error: harness_error

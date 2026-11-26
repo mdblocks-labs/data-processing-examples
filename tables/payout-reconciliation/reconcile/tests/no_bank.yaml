@@ -1,0 +1,34 @@
+# With no usable bank row, every payout is in transit and the bank is read through no
+# date. The summary says so with a null bank_through.
+mdblocks: 1
+given:
+  files:
+  - - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-01', '10.00', usd, P1, '2026-10-02']
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, Pending, '-4.00', CARD PURCHASE]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  summary:
+    merchant: Test Co
+    currency: USD
+    bank_through: null
+    months:
+    - month: 2026-10
+      status: not approved
+      open_payouts: 0
+      open_deposits: 0
+      in_transit: 1

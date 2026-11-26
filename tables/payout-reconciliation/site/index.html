@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payout reconciliation by month</title>
+  <link rel="stylesheet" href="mdb.css" />
+  <script src="mdb.js"></script>
+  <style>
+    /* Layout only; every colour is a token from `mdb.css`. */
+    .months { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .month h3 { margin: 0 0 4px; font-size: 17px; }
+    .state { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; font-size: 13.5px; }
+    .state svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .state.approved { color: var(--mdb-success); }
+    .state.waiting { color: var(--mdb-attention); }
+    .state.stale { color: var(--mdb-alert); }
+    .note { font-size: 12.5px; color: var(--mdb-text-muted); margin: 4px 0 10px; }
+    dl.figures { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 0; font-size: 14px; }
+    dl.figures dt { color: var(--mdb-text-muted); }
+    dl.figures dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    dl.figures .rule { grid-column: 1 / -1; border-top: 1px solid var(--mdb-border); }
+    .open { color: var(--mdb-attention); font-weight: 600; }
+    .mdb-prov { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+<main class="mdb-site">
+  <h1 id="title">Payout reconciliation by month</h1>
+  <p class="mdb-prov" id="page"></p>
+  <p class="mdb-prov" data-prov="reconcile.summary"></p>
+  <p class="mdb-prov" data-prov="record.kept"></p>
+  <div class="months" id="months"></div>
+</main>
+<script type="module">
+  /// <reference path="mdb.d.ts" />
+  const at = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => {
+    const node = Object.assign(document.createElement(tag), props);
+    node.append(...children.filter((c) => c != null));
+    return node;
+  };
+  const SVG = "http://www.w3.org/2000/svg";
+
+  // Lucide: circle-check, clock, triangle-alert.
+  const STATES = {
+    "approved": ["approved", "Approved", ["M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z", "m9 12 2 2 4-4"]],
+    "not approved": ["waiting", "Not approved", ["M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z", "M12 6v6l4 2"]],
+    "approval out of date": ["stale", "Approval out of date",
+      ["m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3", "M12 9v4", "M12 17h.01"]],
+  };
+  const state = (status) => {
+    const [cls, word, paths] = STATES[status];
+    const icon = document.createElementNS(SVG, "svg");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("aria-hidden", "true");
+    for (const d of paths) {
+      const path = document.createElementNS(SVG, "path");
+      path.setAttribute("d", d);
+      icon.append(path);
+    }
+    return el("span", { className: `state ${cls}` }, icon, word);
+  };
+
+  const monthName = (month) => new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric", timeZone: "UTC" })
+    .format(new Date(`${month}-01T00:00:00Z`));
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+  function figures(pairs) {
+    const list = el("dl", { className: "figures" });
+    for (const pair of pairs) {
+      if (!pair) list.append(el("div", { className: "rule" }));
+      else list.append(el("dt", { textContent: pair[0] }), el("dd", {}, pair[1]));
+    }
+    return list;
+  }
+
+  function openCount(n, one) {
+    return el("span", { className: n ? "open" : "", textContent: plural(n, one) });
+  }
+
+  function card(m, money) {
+    const head = [el("h3", { textContent: monthName(m.month) }), state(m.status)];
+    if (m.status === "approved") {
+      const t = m.totals;
+      return el("section", { className: "month mdb-card" }, ...head,
+        el("p", { className: "note", textContent: m.kept
+          ? `Last recorded approval, by ${m.approved_by} on ${m.approved_on}. This run found no rows for this month.`
+          : `Signed off by ${m.approved_by} on ${m.approved_on}.` }),
+        figures([
+          ["Orders", money(t.orders)],
+          ["Refunds", money(t.refunds)],
+          ["Fees", money(t.fees)],
+          ["Paid out", money(t.paid_out)],
+          null,
+          ["Payouts", `${t.payouts}, ${t.matched} matched`],
+          ["Deposits in the month", `${t.deposits}, ${money(t.deposited)}`],
+          ["Still open", el("span", {}, openCount(t.open_payouts, "payout"), ", ", openCount(t.open_deposits, "deposit"))],
+          ["In transit", plural(t.in_transit, "payout")],
+        ]));
+    }
+    const why = m.status === "approval out of date"
+      ? "An export changed after the sign-off. Totals return when the month is approved again."
+      : "Totals appear here once the bookkeeper signs the month off.";
+    return el("section", { className: "month mdb-card" }, ...head,
+      el("p", { className: "note", textContent: why }),
+      figures([
+        ["Open payouts", openCount(m.open_payouts, "payout")],
+        ["Open deposits", openCount(m.open_deposits, "deposit")],
+        ["In transit", plural(m.in_transit, "payout")],
+      ]));
+  }
+
+  async function draw() {
+    const { manifest } = mdb;
+    // A `--no-values` copy carries no runs, so "never run" would be wrong there.
+    const withheld = mdb.entry("reconcile.summary").reason === "--no-values";
+    let summary = null;
+    try {
+      summary = await mdb.value("reconcile.summary");
+    } catch (err) {
+      at("months").replaceChildren(el("div", {
+        className: "mdb-absent",
+        textContent: err.absent
+          ? `reconcile.summary: no value — ${err.absent}${err.reason ? ` (${err.reason})` : ""}`
+          : `reconcile.summary: ${err.message}`,
+      }));
+    }
+    // Months the dataset holds but this run found no rows for: each one's last recorded approval.
+    let kept = [];
+    let keptError = null;
+    try {
+      kept = await mdb.value("record.kept");
+    } catch (err) {
+      keptError = err;
+    }
+    if (summary) {
+      at("title").textContent = `${summary.merchant} · payouts by month`;
+      document.title = `${summary.merchant} — payouts by month`;
+      // Amounts are whole cents, so two decimals in every currency. A kept month uses the currency it was approved in.
+      const moneyIn = (currency) => {
+        const format = new Intl.NumberFormat(undefined, {
+          style: "currency", currency, minimumFractionDigits: 2, maximumFractionDigits: 2,
+        });
+        return (cents) => format.format(cents / 100);
+      };
+      const gone = kept.map((m) => ({ ...m, status: "approved", kept: true }));
+      const months = [...summary.months, ...gone].sort((a, b) => (a.month < b.month ? 1 : -1));
+      at("months").replaceChildren(...(months.length
+        ? months.map((m) => card(m, moneyIn(m.kept ? m.currency : summary.currency)))
+        : [el("p", { className: "note", textContent: "No month has any rows yet." })]));
+      if (keptError && !withheld) {
+        at("months").append(el("div", {
+          className: "mdb-absent",
+          textContent: keptError.absent
+            ? `record.kept: no value — ${keptError.absent}${keptError.reason ? ` (${keptError.reason})` : ""}`
+            : `record.kept: ${keptError.message}`,
+        }));
+      }
+    }
+    at("page").textContent = withheld ? "No recorded values in this copy" : [
+      summary ? (summary.bank_through ? `Bank read through ${summary.bank_through}` : "No bank rows read yet") : null,
+      `${manifest.runs.length} run${manifest.runs.length === 1 ? "" : "s"}`,
+      manifest.asOf ? `as of ${manifest.asOf}` : "never run",
+    ].filter(Boolean).join(" · ");
+    await mdb.bind();
+  }
+
+  // A finished run reloads the page, so every draw starts from a fresh page.
+  try {
+    await mdb.ready();
+    mdb.on("change", () => location.reload());
+    await mdb.ready(); // again, now subscribed, so a run that finished meanwhile is drawn
+  } catch (err) {
+    at("page").textContent = `Can't read the runs: ${err.message}. Reload to try again.`;
+    throw err;
+  }
+  await draw();
+</script>
+</body>
+</html>

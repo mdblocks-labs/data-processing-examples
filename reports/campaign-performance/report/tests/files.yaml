@@ -1,0 +1,184 @@
+# A file that couldn't be decoded, one whose headers match no source and one that
+# matches two are listed, and one with a mapped header twice is left out. Meta has no
+# file and the CRM no usable row: both stale.
+mdblocks: 1
+given:
+  files:
+  - - file: broken.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: []
+      rows: []
+      error: 'UnicodeDecodeError: invalid start byte'
+  - - file: notes.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      header: [Name, Notes]
+      rows:
+      - [a, b]
+      error: null
+  - - file: both.csv
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      header: [Day, Campaign, Cost, Currency, Start, Campaign name, Spent (EUR)]
+      rows: []
+      error: null
+  - - file: two-costs.csv
+      sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      header: [Day, Campaign, Cost, Cost, Currency]
+      rows:
+      - ['2026-11-28', Brand, '10.00', '90.00', USD]
+      error: null
+  - - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-28', Brand, '10.00', USD]
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - [L1, bad, Brand, Won, D1]
+      error: null
+  - - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O1, D1, '2026-11-27', '10.00', '1.00', '0.00', USD]
+      error: null
+  - - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [date, currency, rate]
+      rows:
+      - ['2026-11-01', EUR, '1.10']
+      - ['2026-11-10', EUR, '1.20']
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: null
+params:
+  week_ending: '2026-11-28'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-11-28'
+    period_start: '2026-11-01'
+    totals:
+      spend: '10.00'
+      sales: 0
+      cost_per_sale: null
+      margin: '0.00'
+      margin_after_spend: '-10.00'
+      unattributed_margin: '9.00'
+    campaigns:
+    - campaign: Brand
+      spend: '10.00'
+      sales: 0
+      cost_per_sale: null
+      margin: '0.00'
+      margin_after_spend: '-10.00'
+      recommendation: cut
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '10.00'
+        sales: 0
+        margin: '0.00'
+    files:
+    - file: both.csv
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      source: null
+      rows: 0
+      first: null
+      last: null
+      totals: {}
+    - file: broken.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: null
+      rows: 0
+      first: null
+      last: null
+      totals: {}
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 0
+      first: null
+      last: null
+      totals: {}
+    - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 1
+      first: '2026-11-28'
+      last: '2026-11-28'
+      totals:
+        USD: '10.00'
+    - file: notes.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      source: null
+      rows: 0
+      first: null
+      last: null
+      totals: {}
+    - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: rates
+      rows: 2
+      first: '2026-11-01'
+      last: '2026-11-10'
+      totals: {}
+    - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 1
+      first: '2026-11-27'
+      last: '2026-11-27'
+      totals:
+        USD: '10.00'
+    - file: two-costs.csv
+      sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      source: google
+      rows: 0
+      first: null
+      last: null
+      totals: {}
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'crm: no usable rows'
+    - file: null
+      row: null
+      problem: 'meta: no file in the folder matches its headers'
+    - file: both.csv
+      row: null
+      problem: its headers match google and meta; make one source's headers differ
+    - file: broken.csv
+      row: null
+      problem: 'not read: UnicodeDecodeError: invalid start byte'
+    - file: crm.csv
+      row: 2
+      problem: bad date 'bad'; expected %Y-%m-%d
+    - file: notes.csv
+      row: null
+      problem: its headers match no source in sources.json
+    - file: two-costs.csv
+      row: null
+      problem: has more than one 'Cost' column; left out
+    checksum: 54bde3ceb2e6435e88300877bf6a27fe1701a76bab77828578365a8a735e3254

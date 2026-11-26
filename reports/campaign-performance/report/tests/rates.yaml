@@ -1,0 +1,136 @@
+# A row before the first rate for its currency, and one in a currency with no rate, are
+# listed and left out; a row on a rate's own date uses that rate. Two different rates
+# for one day are listed and leave out the rows that need them; a rate repeated exactly
+# is used.
+mdblocks: 1
+given:
+  files:
+  - - file: meta.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Start, Campaign name, Spent (EUR)]
+      rows:
+      - [01/11/2026, Spring, '100.00']
+      - [05/11/2026, Spring, '100.00']
+      - [10/11/2026, Spring, '10.00']
+      - [27/11/2026, Spring, '10.00']
+      - [28/11/2026, Spring, '10.00']
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - [L1, '2026-11-28', Spring, Open, '']
+      error: null
+  - - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O1, '', '2026-11-28', '10.00', '1.00', '0.00', EUR]
+      - [O2, '', '2026-11-28', '10.00', '1.00', '0.00', GBP]
+      error: null
+  - - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [date, currency, rate]
+      rows:
+      - ['2026-11-05', EUR, '1.10']
+      - ['2026-11-10', EUR, '1.20']
+      - ['2026-11-27', EUR, '1.20']
+      - ['2026-11-27', EUR, '1.30']
+      - ['2026-11-28', EUR, '1.25']
+      - ['2026-11-28', EUR, '1.25']
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: null
+params:
+  week_ending: '2026-11-28'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-11-28'
+    period_start: '2026-11-01'
+    totals:
+      spend: '134.50'
+      sales: 0
+      cost_per_sale: null
+      margin: '0.00'
+      margin_after_spend: '-134.50'
+      unattributed_margin: '11.25'
+    campaigns:
+    - campaign: Spring
+      spend: '134.50'
+      sales: 0
+      cost_per_sale: null
+      margin: '0.00'
+      margin_after_spend: '-134.50'
+      recommendation: cut
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '110.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-14'
+        spend: '12.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '12.50'
+        sales: 0
+        margin: '0.00'
+    files:
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 1
+      first: '2026-11-28'
+      last: '2026-11-28'
+      totals: {}
+    - file: meta.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: meta
+      rows: 5
+      first: '2026-11-01'
+      last: '2026-11-28'
+      totals:
+        EUR: '230.00'
+    - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: rates
+      rows: 6
+      first: '2026-11-05'
+      last: '2026-11-28'
+      totals: {}
+    - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 2
+      first: '2026-11-28'
+      last: '2026-11-28'
+      totals:
+        EUR: '10.00'
+        GBP: '10.00'
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'google: no file in the folder matches its headers'
+    - file: meta.csv
+      row: 2
+      problem: no EUR rate on or before 2026-11-01
+    - file: meta.csv
+      row: 5
+      problem: two different EUR rates on 2026-11-27, the latest on or before 2026-11-27
+    - file: sales.csv
+      row: 3
+      problem: no GBP rate on or before 2026-11-28
+    checksum: 05cd345576c17e2b206d7f791486c4df311336b962a2c7d20a6b327a330f959e

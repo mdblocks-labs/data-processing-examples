@@ -1,0 +1,11 @@
+# A client.json without its target cost per qualified sale stops the run.
+mdblocks: 1
+given:
+  files: []
+  sources: "@sources.json"
+  client: {name: Test Co, currency: USD}
+  previous: null
+params:
+  week_ending: "2026-11-28"
+expect_state: failed
+expect_error: harness_error

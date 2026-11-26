@@ -1,0 +1,13 @@
+# A sources.json header that is null, not a header name, stops the run, naming the source
+# and column, rather than leaving that source's files unmatched.
+mdblocks: 1
+given:
+  files: []
+  sources:
+    google: {kind: spend, columns: {date: Day, campaign: Campaign, spend: null, currency: Currency}, date_format: "%Y-%m-%d"}
+  client: {name: Test Co, currency: USD, target_cost_per_sale: "100.00"}
+  previous: null
+params:
+  week_ending: "2026-11-28"
+expect_state: failed
+expect_error: harness_error

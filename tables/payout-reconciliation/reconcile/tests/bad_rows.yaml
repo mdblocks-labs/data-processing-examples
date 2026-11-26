@@ -1,0 +1,166 @@
+# Every row that can't be used is listed with its file and row and left out: a bad
+# date, a bad amount, more than two decimals, a trillion or more, another currency, a
+# payout ID without a payout date and the reverse, no ID, and a row with too few cells.
+# Blank rows are skipped. A row with neither payout ID nor date is not paid out: it is
+# in the evidence, in no month.
+mdblocks: 1
+given:
+  files:
+  - - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-01', '1,250.00', usd, P1, '2026-10-02']
+      - [ch2, '2026-13-01', '5.00', usd, P1, '2026-10-02']
+      - [ch3, '2026-10-01', '5,00', usd, P1, '2026-10-02']
+      - [ch4, '2026-10-01', '5.001', usd, P1, '2026-10-02']
+      - [ch5, '2026-10-01', '1000000000000.00', usd, P1, '2026-10-02']
+      - [ch6, '2026-10-01', '5.00', eur, P1, '2026-10-02']
+      - [ch7, '2026-10-01', '5.00', usd, P1, '']
+      - [ch8, '2026-10-01', '5.00', usd, '', '2026-10-02']
+      - ['', '2026-10-01', '5.00', usd, P1, '2026-10-02']
+      - [ch9, '2026-10-01', '5.00']
+      - ['', '', '', '', '', '']
+      - [ch10, '2026-10-03', '7.25', usd, '', '']
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-10-02', '1250.00', CARD P1]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-10-02'
+    months:
+    - month: 2026-10
+      checksum: 62804ae3c7cf690aad5aa9c2f641345ed46f4240dbf5a23de7988e897ecb7bc6
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 1
+        paid_out: 125000
+        orders: 125000
+        refunds: 0
+        fees: 0
+        deposits: 1
+        deposited: 125000
+        matched: 1
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 0
+    payouts:
+    - processor: card
+      payout_id: P1
+      date: '2026-10-02'
+      dates: ['2026-10-02']
+      month: 2026-10
+      amount: 125000
+      orders: 125000
+      refunds: 0
+      fees: 0
+      status: matched
+      bank:
+        file: bank.csv
+        row: 2
+        date: '2026-10-02'
+        amount: 125000
+      difference: 0
+    evidence:
+    - month: 2026-10
+      status: matched
+      file: bank.csv
+      row: 2
+      source: bank
+      kind: bank
+      id: T1
+      date: '2026-10-02'
+      amount: 125000
+      processor: card
+      payout_id: P1
+      payout_date: null
+      description: CARD P1
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: matched
+      file: card.csv
+      row: 2
+      source: card_orders
+      kind: orders
+      id: ch1
+      date: '2026-10-01'
+      amount: 125000
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: bank.csv
+      bank_row: 2
+    - month: null
+      status: not paid out
+      file: card.csv
+      row: 13
+      source: card_orders
+      kind: orders
+      id: ch10
+      date: '2026-10-03'
+      amount: 725
+      processor: card
+      payout_id: null
+      payout_date: null
+      description: null
+      bank_file: null
+      bank_row: null
+    files:
+    - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: bank
+      rows: 1
+      first: '2026-10-02'
+      last: '2026-10-02'
+      total: 125000
+    - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_orders
+      rows: 2
+      first: '2026-10-01'
+      last: '2026-10-03'
+      total: 125725
+    review:
+    - file: card.csv
+      row: 3
+      problem: bad date '2026-13-01'; expected %Y-%m-%d
+    - file: card.csv
+      row: 4
+      problem: bad amount '5,00'
+    - file: card.csv
+      row: 5
+      problem: amount '5.001' has more than two decimals
+    - file: card.csv
+      row: 6
+      problem: amount '1000000000000.00' is too large
+    - file: card.csv
+      row: 7
+      problem: currency EUR, not the merchant's USD
+    - file: card.csv
+      row: 8
+      problem: payout ID without a payout date
+    - file: card.csv
+      row: 9
+      problem: payout date without a payout ID
+    - file: card.csv
+      row: 10
+      problem: no id
+    - file: card.csv
+      row: 11
+      problem: has 3 cells; the header has 6

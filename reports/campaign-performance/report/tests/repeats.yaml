@@ -1,0 +1,158 @@
+# A key in two files of one source counts from the file whose path sorts last, with all
+# its rows for that key (an export by ad group has several); each file keeps its own
+# total. A deal on two won leads counts in the totals but no campaign; one lead listed
+# twice still counts. A sale refunded in full is margin but not a qualified sale.
+mdblocks: 1
+given:
+  files:
+  - - file: b/google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-02', Brand, '120.00', USD]
+      - ['2026-11-02', Brand, '30.00', USD]
+      error: null
+  - - file: a/google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-02', Brand, '100.00', USD]
+      - ['2026-11-28', Brand, '50.00', USD]
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - [L1, '2026-11-25', Brand, Won, D1]
+      - [L2, '2026-11-25', Brand, Won, D2]
+      - [L3, '2026-11-25', Tents, Won, D2]
+      - [L4, '2026-11-25', Brand, Won, D3]
+      - [L4, '2026-11-25', Brand, Won, D3]
+      error: null
+  - - file: sales-2.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O3, D3, '2026-11-27', '100.00', '40.00', '0.00', USD]
+      error: null
+  - - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O1, D1, '2026-11-25', '300.00', '100.00', '300.00', USD]
+      - [O2, D2, '2026-11-26', '500.00', '100.00', '0.00', USD]
+      error: null
+  - - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [date, currency, rate]
+      rows:
+      - ['2026-11-01', EUR, '1.10']
+      - ['2026-11-10', EUR, '1.20']
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: null
+params:
+  week_ending: '2026-11-28'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-11-28'
+    period_start: '2026-11-01'
+    totals:
+      spend: '200.00'
+      sales: 2
+      cost_per_sale: '100.00'
+      margin: '360.00'
+      margin_after_spend: '160.00'
+      unattributed_margin: '0.00'
+    campaigns:
+    - campaign: Brand
+      spend: '200.00'
+      sales: 1
+      cost_per_sale: '200.00'
+      margin: '-40.00'
+      margin_after_spend: '-240.00'
+      recommendation: cut
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '150.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '50.00'
+        sales: 1
+        margin: '-40.00'
+    files:
+    - file: a/google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 2
+      first: '2026-11-02'
+      last: '2026-11-28'
+      totals:
+        USD: '150.00'
+    - file: b/google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 2
+      first: '2026-11-02'
+      last: '2026-11-02'
+      totals:
+        USD: '150.00'
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 5
+      first: '2026-11-25'
+      last: '2026-11-25'
+      totals: {}
+    - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: rates
+      rows: 2
+      first: '2026-11-01'
+      last: '2026-11-10'
+      totals: {}
+    - file: sales-2.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      source: sales
+      rows: 1
+      first: '2026-11-27'
+      last: '2026-11-27'
+      totals:
+        USD: '100.00'
+    - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 2
+      first: '2026-11-25'
+      last: '2026-11-26'
+      totals:
+        USD: '800.00'
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'meta: no file in the folder matches its headers'
+    - file: a/google.csv
+      row: 2
+      problem: repeated in b/google.csv row 3, which is counted
+    - file: sales.csv
+      row: 3
+      problem: deal D2 is on won leads L2 and L3; counted in the totals only
+    checksum: c88a1c6bb3915da9c5fb602b17163c4aa1f7298635de35483a99216904146ff1

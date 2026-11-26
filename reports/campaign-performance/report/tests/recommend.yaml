@@ -1,0 +1,192 @@
+# Three campaigns, one per recommendation. Meta spend is in euros at the latest rate on
+# or before each day; rows outside the 28 days are left out; a lost lead's sale and a
+# sale with no deal count for no campaign.
+mdblocks: 1
+given:
+  files:
+  - - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-02', Brand, '100.00', USD]
+      - ['2026-11-28', Brand, '40.00', USD]
+      - ['2026-11-29', Brand, '999.00', USD]
+      - ['2026-10-31', Brand, '999.00', USD]
+      - ['2026-11-03', Tents, '300.00', USD]
+      error: null
+  - - file: meta.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Start, Campaign name, Spent (EUR)]
+      rows:
+      - [09/11/2026, Spring, '100.00']
+      - [10/11/2026, Spring, '100.00']
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - [L1, '2026-11-01', Brand, Won, D1]
+      - [L2, '2026-11-01', Brand, Won, D2]
+      - [L3, '2026-11-01', Tents, Won, D3]
+      - [L4, '2026-11-01', Spring, Won, D4]
+      - [L5, '2026-11-27', Spring, Lost, D5]
+      error: null
+  - - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O1, D1, '2026-11-05', '200.00', '80.00', '0.00', USD]
+      - [O2, D2, '2026-11-26', '150.00', '60.00', '0.00', USD]
+      - [O3, D3, '2026-11-07', '400.00', '200.00', '0.00', USD]
+      - [O4, D4, '2026-11-12', '600.00', '200.00', '0.00', USD]
+      - [O5, D5, '2026-11-27', '50.00', '10.00', '0.00', USD]
+      - [O6, '', '2026-11-28', '90.00', '40.00', '0.00', USD]
+      error: null
+  - - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [date, currency, rate]
+      rows:
+      - ['2026-11-01', EUR, '1.10']
+      - ['2026-11-10', EUR, '1.20']
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: null
+params:
+  week_ending: '2026-11-28'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-11-28'
+    period_start: '2026-11-01'
+    totals:
+      spend: '670.00'
+      sales: 4
+      cost_per_sale: '167.50'
+      margin: '810.00'
+      margin_after_spend: '140.00'
+      unattributed_margin: '90.00'
+    campaigns:
+    - campaign: Brand
+      spend: '140.00'
+      sales: 2
+      cost_per_sale: '70.00'
+      margin: '210.00'
+      margin_after_spend: '70.00'
+      recommendation: scale
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '100.00'
+        sales: 1
+        margin: '120.00'
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '40.00'
+        sales: 1
+        margin: '90.00'
+    - campaign: Spring
+      spend: '230.00'
+      sales: 1
+      cost_per_sale: '230.00'
+      margin: '400.00'
+      margin_after_spend: '170.00'
+      recommendation: hold
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-14'
+        spend: '230.00'
+        sales: 1
+        margin: '400.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+    - campaign: Tents
+      spend: '300.00'
+      sales: 1
+      cost_per_sale: '300.00'
+      margin: '200.00'
+      margin_after_spend: '-100.00'
+      recommendation: cut
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '300.00'
+        sales: 1
+        margin: '200.00'
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+    files:
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 5
+      first: '2026-11-01'
+      last: '2026-11-27'
+      totals: {}
+    - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 5
+      first: '2026-10-31'
+      last: '2026-11-29'
+      totals:
+        USD: '2438.00'
+    - file: meta.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: meta
+      rows: 2
+      first: '2026-11-09'
+      last: '2026-11-10'
+      totals:
+        EUR: '200.00'
+    - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: rates
+      rows: 2
+      first: '2026-11-01'
+      last: '2026-11-10'
+      totals: {}
+    - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 6
+      first: '2026-11-05'
+      last: '2026-11-28'
+      totals:
+        USD: '1490.00'
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'meta: no row on 2026-11-28, the week ending; last before it 2026-11-10'
+    checksum: 46bb4d8369c5b0cf674866735b44a7e9887702bf36ef8e47598460e0e0537b91

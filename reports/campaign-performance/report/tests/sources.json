@@ -1,0 +1,7 @@
+{
+  "google": {"kind": "spend", "columns": {"date": "Day", "campaign": "Campaign", "spend": "Cost", "currency": "Currency"}, "date_format": "%Y-%m-%d"},
+  "meta": {"kind": "spend", "columns": {"date": "Start", "campaign": "Campaign name", "spend": "Spent (EUR)"}, "currency": "EUR", "date_format": "%d/%m/%Y"},
+  "crm": {"kind": "leads", "columns": {"lead": "Lead", "date": "Created", "campaign": "Campaign", "stage": "Stage", "deal": "Deal"}, "won": ["Won"], "date_format": "%Y-%m-%d"},
+  "sales": {"kind": "sales", "columns": {"order": "Order", "deal": "Deal", "date": "Date", "revenue": "Revenue", "cost": "Cost of goods", "refund": "Refund", "currency": "Currency"}, "date_format": "%Y-%m-%d"},
+  "rates": {"kind": "rates", "columns": {"date": "date", "currency": "currency", "rate": "rate"}, "date_format": "%Y-%m-%d"}
+}

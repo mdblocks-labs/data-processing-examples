@@ -1,0 +1,128 @@
+# Spend with no row on the week ending is stale, as is a CRM or sales export with no row
+# in the seven days ending then; rows after it don't count, a sales row six days back is
+# enough. A rate source with no file is listed, and so is each row it leaves without a
+# rate.
+mdblocks: 1
+given:
+  files:
+  - - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-27', Brand, '10.00', USD]
+      - ['2026-11-29', Brand, '10.00', USD]
+      error: null
+  - - file: meta.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Start, Campaign name, Spent (EUR)]
+      rows:
+      - [28/11/2026, Spring, '10.00']
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - [L1, '2026-11-21', Brand, Open, '']
+      - [L2, '2026-11-30', Brand, Open, '']
+      error: null
+  - - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O1, '', '2026-11-22', '10.00', '1.00', '0.00', USD]
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: null
+params:
+  week_ending: '2026-11-28'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-11-28'
+    period_start: '2026-11-01'
+    totals:
+      spend: '10.00'
+      sales: 0
+      cost_per_sale: null
+      margin: '0.00'
+      margin_after_spend: '-10.00'
+      unattributed_margin: '9.00'
+    campaigns:
+    - campaign: Brand
+      spend: '10.00'
+      sales: 0
+      cost_per_sale: null
+      margin: '0.00'
+      margin_after_spend: '-10.00'
+      recommendation: cut
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '10.00'
+        sales: 0
+        margin: '0.00'
+    files:
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 2
+      first: '2026-11-21'
+      last: '2026-11-30'
+      totals: {}
+    - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 2
+      first: '2026-11-27'
+      last: '2026-11-29'
+      totals:
+        USD: '20.00'
+    - file: meta.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: meta
+      rows: 1
+      first: '2026-11-28'
+      last: '2026-11-28'
+      totals:
+        EUR: '10.00'
+    - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 1
+      first: '2026-11-22'
+      last: '2026-11-22'
+      totals:
+        USD: '10.00'
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'crm: no rows in the week ending 2026-11-28'
+    - file: null
+      row: null
+      problem: 'google: no row on 2026-11-28, the week ending; last before it 2026-11-27'
+    - file: null
+      row: null
+      problem: 'rates: no file in the folder matches its headers'
+    - file: meta.csv
+      row: 2
+      problem: no EUR rate on or before 2026-11-28
+    checksum: 8c6959afaa74ee1c2ff6d2f52f9d969bb8c3d9e0903803956cbafe2fa7c15441

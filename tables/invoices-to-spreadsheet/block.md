@@ -1,20 +1,20 @@
 ---
 mdblocks: 1
-type: mdblocks/block
 kind: composite
 ports:
   in:
-    folder:
-      type: Param
-      dtype: string
-      default: "samples/invoices"
     schema: Json
   out:
     invoices: Table
     line_items: Table
     review: Table
     workbook: Bytes
-field: Data processing / Tables / Extraction
+params:
+  folder:
+    dtype: string
+    default: "samples/invoices"
+card:
+  field: Data processing / Tables / Extraction
 ---
 
 # invoices-to-spreadsheet
@@ -41,22 +41,21 @@ import export
 import extract
 import per_document
 
-@in.folder        -> collect.folder
 collect.documents -> per_document.documents
 
 per_document.text -> extract.text
-@in.schema        -> extract.schema
-@in.schema        -> assemble.schema
-extract.records   -> assemble.records
+@in.schema -> extract.schema
+@in.schema -> assemble.schema
+extract.records -> assemble.records
 
-assemble.invoices   -> export.invoices
+assemble.invoices -> export.invoices
 assemble.line_items -> export.line_items
-assemble.review     -> export.review
+assemble.review -> export.review
 
-assemble.invoices   -> @out.invoices
+assemble.invoices -> @out.invoices
 assemble.line_items -> @out.line_items
-assemble.review     -> @out.review
-export.workbook     -> @out.workbook
+assemble.review -> @out.review
+export.workbook -> @out.workbook
 ```
 
 ## Try it

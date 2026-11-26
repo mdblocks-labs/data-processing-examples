@@ -1,0 +1,381 @@
+{
+  "client": "Alder & Pine Outfitters",
+  "currency": "USD",
+  "target_cost_per_sale": "120.00",
+  "settings": "3781fbd1bb1556faacf60581fd095fc9abe8066a96533a2b8f5f670e230ecb49",
+  "week_ending": "2026-11-15",
+  "period_start": "2026-10-19",
+  "totals": {
+    "spend": "6824.86",
+    "sales": 73,
+    "cost_per_sale": "93.49",
+    "margin": "8194.00",
+    "margin_after_spend": "1369.14",
+    "unattributed_margin": "220.00"
+  },
+  "campaigns": [
+    {
+      "campaign": "Prospecting - Spring",
+      "spend": "1025.02",
+      "sales": 6,
+      "cost_per_sale": "170.84",
+      "margin": "1236.00",
+      "margin_after_spend": "210.98",
+      "recommendation": "hold",
+      "weeks": [
+        {
+          "week_ending": "2026-10-25",
+          "spend": "254.97",
+          "sales": 1,
+          "margin": "206.00"
+        },
+        {
+          "week_ending": "2026-11-01",
+          "spend": "256.14",
+          "sales": 2,
+          "margin": "412.00"
+        },
+        {
+          "week_ending": "2026-11-08",
+          "spend": "256.56",
+          "sales": 2,
+          "margin": "412.00"
+        },
+        {
+          "week_ending": "2026-11-15",
+          "spend": "257.35",
+          "sales": 1,
+          "margin": "206.00"
+        }
+      ]
+    },
+    {
+      "campaign": "Retargeting - Cart",
+      "spend": "446.18",
+      "sales": 21,
+      "cost_per_sale": "21.25",
+      "margin": "1491.00",
+      "margin_after_spend": "1044.82",
+      "recommendation": "scale",
+      "weeks": [
+        {
+          "week_ending": "2026-10-25",
+          "spend": "110.99",
+          "sales": 5,
+          "margin": "355.00"
+        },
+        {
+          "week_ending": "2026-11-01",
+          "spend": "111.49",
+          "sales": 6,
+          "margin": "426.00"
+        },
+        {
+          "week_ending": "2026-11-08",
+          "spend": "111.68",
+          "sales": 5,
+          "margin": "355.00"
+        },
+        {
+          "week_ending": "2026-11-15",
+          "spend": "112.03",
+          "sales": 5,
+          "margin": "355.00"
+        }
+      ]
+    },
+    {
+      "campaign": "Search - Brand",
+      "spend": "1158.67",
+      "sales": 17,
+      "cost_per_sale": "68.16",
+      "margin": "1547.00",
+      "margin_after_spend": "388.33",
+      "recommendation": "scale",
+      "weeks": [
+        {
+          "week_ending": "2026-10-25",
+          "spend": "288.42",
+          "sales": 4,
+          "margin": "364.00"
+        },
+        {
+          "week_ending": "2026-11-01",
+          "spend": "289.25",
+          "sales": 4,
+          "margin": "364.00"
+        },
+        {
+          "week_ending": "2026-11-08",
+          "spend": "290.09",
+          "sales": 5,
+          "margin": "455.00"
+        },
+        {
+          "week_ending": "2026-11-15",
+          "spend": "290.91",
+          "sales": 4,
+          "margin": "364.00"
+        }
+      ]
+    },
+    {
+      "campaign": "Search - Tents",
+      "spend": "2456.96",
+      "sales": 11,
+      "cost_per_sale": "223.36",
+      "margin": "1276.00",
+      "margin_after_spend": "-1180.96",
+      "recommendation": "cut",
+      "weeks": [
+        {
+          "week_ending": "2026-10-25",
+          "spend": "611.60",
+          "sales": 3,
+          "margin": "348.00"
+        },
+        {
+          "week_ending": "2026-11-01",
+          "spend": "613.36",
+          "sales": 2,
+          "margin": "232.00"
+        },
+        {
+          "week_ending": "2026-11-08",
+          "spend": "615.12",
+          "sales": 3,
+          "margin": "348.00"
+        },
+        {
+          "week_ending": "2026-11-15",
+          "spend": "616.88",
+          "sales": 3,
+          "margin": "348.00"
+        }
+      ]
+    },
+    {
+      "campaign": "Shopping - Boots",
+      "spend": "1738.02",
+      "sales": 18,
+      "cost_per_sale": "96.56",
+      "margin": "2644.00",
+      "margin_after_spend": "905.98",
+      "recommendation": "scale",
+      "weeks": [
+        {
+          "week_ending": "2026-10-25",
+          "spend": "432.64",
+          "sales": 4,
+          "margin": "428.00"
+        },
+        {
+          "week_ending": "2026-11-01",
+          "spend": "433.88",
+          "sales": 4,
+          "margin": "428.00"
+        },
+        {
+          "week_ending": "2026-11-08",
+          "spend": "435.12",
+          "sales": 5,
+          "margin": "1253.00"
+        },
+        {
+          "week_ending": "2026-11-15",
+          "spend": "436.38",
+          "sales": 5,
+          "margin": "535.00"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "file": "crm-leads-2026-W43.csv",
+      "sha256": "9364df08ac8ee1d332927cebb45910f02462f4e7be2f67ab7df3a494e78e109f",
+      "source": "crm",
+      "rows": 51,
+      "first": "2026-10-16",
+      "last": "2026-10-19",
+      "totals": {}
+    },
+    {
+      "file": "crm-leads-2026-W44.csv",
+      "sha256": "aae1e1c07a588d34f11e0ba4888fc043b9f1409ca973eae3961656b64e2c1666",
+      "source": "crm",
+      "rows": 54,
+      "first": "2026-10-20",
+      "last": "2026-10-26",
+      "totals": {}
+    },
+    {
+      "file": "crm-leads-2026-W45.csv",
+      "sha256": "caec9c3b223c4ff16e19af88a425e1752975060e034f0bde6243d79456d0731f",
+      "source": "crm",
+      "rows": 58,
+      "first": "2026-10-28",
+      "last": "2026-11-03",
+      "totals": {}
+    },
+    {
+      "file": "crm-leads-2026-W46.csv",
+      "sha256": "07bd4db1106430f4c2d9e60d5e673b8e6ba0aae15cc731c3d99477690a406e65",
+      "source": "crm",
+      "rows": 54,
+      "first": "2026-11-04",
+      "last": "2026-11-10",
+      "totals": {}
+    },
+    {
+      "file": "fx-rates.csv",
+      "sha256": "d2b76c52298a0707cd11a0e9b0ee08b80bbe9fab7df7fdd2504241ec2fe037ac",
+      "source": "rates",
+      "rows": 35,
+      "first": "2026-10-12",
+      "last": "2026-11-15",
+      "totals": {}
+    },
+    {
+      "file": "google-ads-2026-W43.csv",
+      "sha256": "3218df5e21cb631b8013440e90f9466af79d7a4b730cf09c447f623aac44d90f",
+      "source": "google_ads",
+      "rows": 21,
+      "first": "2026-10-19",
+      "last": "2026-10-25",
+      "totals": {
+        "USD": "1332.66"
+      }
+    },
+    {
+      "file": "google-ads-2026-W44.csv",
+      "sha256": "baa9b8f5f464045b08f14a5f36cb22a1b0997f698b0181a1c91aa930242cf60e",
+      "source": "google_ads",
+      "rows": 21,
+      "first": "2026-10-26",
+      "last": "2026-11-01",
+      "totals": {
+        "USD": "1336.49"
+      }
+    },
+    {
+      "file": "google-ads-2026-W45.csv",
+      "sha256": "60e6744a774e9ccb882361eb14812323ec769367d871742b9d5fa6686154cc36",
+      "source": "google_ads",
+      "rows": 21,
+      "first": "2026-11-02",
+      "last": "2026-11-08",
+      "totals": {
+        "USD": "1340.33"
+      }
+    },
+    {
+      "file": "google-ads-2026-W46.csv",
+      "sha256": "138e31569d74c11af7c1dcf344165a0d5141e49322340a858b9f2e01883c6e7d",
+      "source": "google_ads",
+      "rows": 21,
+      "first": "2026-11-09",
+      "last": "2026-11-15",
+      "totals": {
+        "USD": "1344.17"
+      }
+    },
+    {
+      "file": "meta-ads-2026-W43.csv",
+      "sha256": "a592eec1fadd2ea192a311914849cafd973619185ecf71c38ebbae91f830e6ff",
+      "source": "meta_ads",
+      "rows": 14,
+      "first": "2026-10-19",
+      "last": "2026-10-25",
+      "totals": {
+        "EUR": "339.16"
+      }
+    },
+    {
+      "file": "meta-ads-2026-W44.csv",
+      "sha256": "a567e2302571839a5038dc3894bea3a427012e11eff81059f8eb2892fd23c6e7",
+      "source": "meta_ads",
+      "rows": 14,
+      "first": "2026-10-26",
+      "last": "2026-11-01",
+      "totals": {
+        "EUR": "340.13"
+      }
+    },
+    {
+      "file": "meta-ads-2026-W45.csv",
+      "sha256": "63126e04498c27810379454eb98bae97afb5338bda34d0e3dda62ab2f19845ed",
+      "source": "meta_ads",
+      "rows": 14,
+      "first": "2026-11-02",
+      "last": "2026-11-08",
+      "totals": {
+        "EUR": "341.11"
+      }
+    },
+    {
+      "file": "meta-ads-2026-W46.csv",
+      "sha256": "8dc32277bc21e24dab953121b2c158bc201a330837ad6229f96d6c13c4e97ac5",
+      "source": "meta_ads",
+      "rows": 14,
+      "first": "2026-11-09",
+      "last": "2026-11-15",
+      "totals": {
+        "EUR": "342.09"
+      }
+    },
+    {
+      "file": "sales-2026-W43.csv",
+      "sha256": "c8a8ca2140835fa66984494fe74d93c3e074cfdd4ab55b31655bd845f0fca01b",
+      "source": "sales",
+      "rows": 18,
+      "first": "2026-10-19",
+      "last": "2026-10-25",
+      "totals": {
+        "USD": "3450.00"
+      }
+    },
+    {
+      "file": "sales-2026-W44.csv",
+      "sha256": "922eb989f84ce2f05dae7d6a3e36d9cfee27c2cabcbfc56f3a164c8c0bfc23a1",
+      "source": "sales",
+      "rows": 19,
+      "first": "2026-10-26",
+      "last": "2026-10-31",
+      "totals": {
+        "USD": "3632.00"
+      }
+    },
+    {
+      "file": "sales-2026-W45.csv",
+      "sha256": "3ef9370c3bab39f4a39c35d53254a8d9d8bfa83c7e19a2b3ac1b89b0519570c4",
+      "source": "sales",
+      "rows": 21,
+      "first": "2026-11-03",
+      "last": "2026-11-08",
+      "totals": {
+        "USD": "5430.00"
+      }
+    },
+    {
+      "file": "sales-2026-W46.csv",
+      "sha256": "3be7888723348ec9d1739cd9fcbdd006ccfb9653e333dff34dd2b951754948ff",
+      "source": "sales",
+      "rows": 19,
+      "first": "2026-11-09",
+      "last": "2026-11-14",
+      "totals": {
+        "USD": "3669.00"
+      }
+    }
+  ],
+  "changes": null,
+  "review": [
+    {
+      "file": "meta-ads-2026-W44.csv",
+      "row": 5,
+      "problem": "bad date '32/10/2026'; expected %d/%m/%Y"
+    }
+  ],
+  "checksum": "3f3bebe2d19c44ae54232227875ea0b083d5994c173900130b52e51014020275"
+}

@@ -1,0 +1,57 @@
+# A corrected export makes an approval out of date. Both months were approved with the
+# checksums the last run reported; then November's deposit was corrected. November's
+# evidence changed, so its approval is out of date; October's didn't, so it stays
+# approved.
+mdblocks: 1
+given:
+  files:
+  - - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-20', '40.00', usd, P1, '2026-10-21']
+      - [ch2, '2026-11-02', '15.00', usd, P2, '2026-11-03']
+      error: null
+  - - file: bank.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-10-22', '40.00', CARD P1]
+      - [T2, '2026-11-04', '14.00', CARD P2]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: |
+    month,checksum,approved_by,approved_on
+    2026-10,3d1c436a4b6fcc85a1a9344d1db024f287eed7e4f21a9ca673eba45173f3d042,A. Reyes,2026-11-05
+    2026-11,ea062627b821ad4b86f099b132393e5cc6f92fd37aaf3270e81f87391ba0d3cd,A. Reyes,2026-11-20
+expect:
+  summary:
+    merchant: Test Co
+    currency: USD
+    bank_through: '2026-11-04'
+    months:
+    - month: 2026-10
+      status: approved
+      approved_by: A. Reyes
+      approved_on: '2026-11-05'
+      totals:
+        payouts: 1
+        paid_out: 4000
+        orders: 4000
+        refunds: 0
+        fees: 0
+        deposits: 1
+        deposited: 4000
+        matched: 1
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 0
+    - month: 2026-11
+      status: approval out of date
+      open_payouts: 1
+      open_deposits: 1
+      in_transit: 0

@@ -1,0 +1,388 @@
+# Two candidates on either side are ambiguous, never a guess. By ID: T1 names both P1
+# and P2; P3 is named by T2 and T3. By amount and date: T4 could be M1 or M2, both
+# 25.00 and in the window; M3 (40.00) has two deposits it could be, T5 and T6. A
+# market payout of 70.00 with exactly one deposit of its amount still ties (M4, T7).
+mdblocks: 1
+given:
+  files:
+  - - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-01', '10.00', usd, P1, '2026-10-02']
+      - [ch2, '2026-10-01', '20.00', usd, P2, '2026-10-02']
+      - [ch3, '2026-10-01', '30.00', usd, P3, '2026-10-02']
+      error: null
+  - - file: market.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Date, Total, Settlement, Settled]
+      rows:
+      - [M-1, 10/01/2026, '25.00', M1, 10/02/2026]
+      - [M-2, 10/02/2026, '25.00', M2, 10/03/2026]
+      - [M-3, 10/03/2026, '40.00', M3, 10/04/2026]
+      - [M-4, 10/03/2026, '70.00', M4, 10/04/2026]
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-10-03', '30.00', CARD P1 P2]
+      - [T2, '2026-10-03', '15.00', CARD P3 PART 1]
+      - [T3, '2026-10-03', '15.00', CARD P3 PART 2]
+      - [T4, '2026-10-04', '25.00', MARKET CREDIT]
+      - [T5, '2026-10-05', '40.00', MARKET CREDIT]
+      - [T6, '2026-10-06', '40.00', MARKET CREDIT]
+      - [T7, '2026-10-06', '70.00', MARKET CREDIT]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-10-06'
+    months:
+    - month: 2026-10
+      checksum: fda29d6dd04b1e489e33c123858910bffcd05ac3a8c624b2d2bf4b62b331bc70
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 7
+        paid_out: 22000
+        orders: 22000
+        refunds: 0
+        fees: 0
+        deposits: 7
+        deposited: 23500
+        matched: 1
+        open_payouts: 6
+        open_deposits: 6
+        in_transit: 0
+    payouts:
+    - processor: card
+      payout_id: P1
+      date: '2026-10-02'
+      dates: ['2026-10-02']
+      month: 2026-10
+      amount: 1000
+      orders: 1000
+      refunds: 0
+      fees: 0
+      status: ambiguous
+      bank: null
+      difference: null
+    - processor: card
+      payout_id: P2
+      date: '2026-10-02'
+      dates: ['2026-10-02']
+      month: 2026-10
+      amount: 2000
+      orders: 2000
+      refunds: 0
+      fees: 0
+      status: ambiguous
+      bank: null
+      difference: null
+    - processor: card
+      payout_id: P3
+      date: '2026-10-02'
+      dates: ['2026-10-02']
+      month: 2026-10
+      amount: 3000
+      orders: 3000
+      refunds: 0
+      fees: 0
+      status: ambiguous
+      bank: null
+      difference: null
+    - processor: market
+      payout_id: M1
+      date: '2026-10-02'
+      dates: ['2026-10-02']
+      month: 2026-10
+      amount: 2500
+      orders: 2500
+      refunds: 0
+      fees: 0
+      status: ambiguous
+      bank: null
+      difference: null
+    - processor: market
+      payout_id: M2
+      date: '2026-10-03'
+      dates: ['2026-10-03']
+      month: 2026-10
+      amount: 2500
+      orders: 2500
+      refunds: 0
+      fees: 0
+      status: ambiguous
+      bank: null
+      difference: null
+    - processor: market
+      payout_id: M3
+      date: '2026-10-04'
+      dates: ['2026-10-04']
+      month: 2026-10
+      amount: 4000
+      orders: 4000
+      refunds: 0
+      fees: 0
+      status: ambiguous
+      bank: null
+      difference: null
+    - processor: market
+      payout_id: M4
+      date: '2026-10-04'
+      dates: ['2026-10-04']
+      month: 2026-10
+      amount: 7000
+      orders: 7000
+      refunds: 0
+      fees: 0
+      status: matched
+      bank:
+        file: bank.csv
+        row: 8
+        date: '2026-10-06'
+        amount: 7000
+      difference: 0
+    evidence:
+    - month: 2026-10
+      status: ambiguous
+      file: bank.csv
+      row: 2
+      source: bank
+      kind: bank
+      id: T1
+      date: '2026-10-03'
+      amount: 3000
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: CARD P1 P2
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: bank.csv
+      row: 3
+      source: bank
+      kind: bank
+      id: T2
+      date: '2026-10-03'
+      amount: 1500
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: CARD P3 PART 1
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: bank.csv
+      row: 4
+      source: bank
+      kind: bank
+      id: T3
+      date: '2026-10-03'
+      amount: 1500
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: CARD P3 PART 2
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: bank.csv
+      row: 5
+      source: bank
+      kind: bank
+      id: T4
+      date: '2026-10-04'
+      amount: 2500
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: MARKET CREDIT
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: bank.csv
+      row: 6
+      source: bank
+      kind: bank
+      id: T5
+      date: '2026-10-05'
+      amount: 4000
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: MARKET CREDIT
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: bank.csv
+      row: 7
+      source: bank
+      kind: bank
+      id: T6
+      date: '2026-10-06'
+      amount: 4000
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: MARKET CREDIT
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: matched
+      file: bank.csv
+      row: 8
+      source: bank
+      kind: bank
+      id: T7
+      date: '2026-10-06'
+      amount: 7000
+      processor: market
+      payout_id: M4
+      payout_date: null
+      description: MARKET CREDIT
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: card.csv
+      row: 2
+      source: card_orders
+      kind: orders
+      id: ch1
+      date: '2026-10-01'
+      amount: 1000
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: card.csv
+      row: 3
+      source: card_orders
+      kind: orders
+      id: ch2
+      date: '2026-10-01'
+      amount: 2000
+      processor: card
+      payout_id: P2
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: card.csv
+      row: 4
+      source: card_orders
+      kind: orders
+      id: ch3
+      date: '2026-10-01'
+      amount: 3000
+      processor: card
+      payout_id: P3
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: market.csv
+      row: 2
+      source: market_orders
+      kind: orders
+      id: M-1
+      date: '2026-10-01'
+      amount: 2500
+      processor: market
+      payout_id: M1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: market.csv
+      row: 3
+      source: market_orders
+      kind: orders
+      id: M-2
+      date: '2026-10-02'
+      amount: 2500
+      processor: market
+      payout_id: M2
+      payout_date: '2026-10-03'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: ambiguous
+      file: market.csv
+      row: 4
+      source: market_orders
+      kind: orders
+      id: M-3
+      date: '2026-10-03'
+      amount: 4000
+      processor: market
+      payout_id: M3
+      payout_date: '2026-10-04'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: matched
+      file: market.csv
+      row: 5
+      source: market_orders
+      kind: orders
+      id: M-4
+      date: '2026-10-03'
+      amount: 7000
+      processor: market
+      payout_id: M4
+      payout_date: '2026-10-04'
+      description: null
+      bank_file: bank.csv
+      bank_row: 8
+    files:
+    - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: bank
+      rows: 7
+      first: '2026-10-03'
+      last: '2026-10-06'
+      total: 23500
+    - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_orders
+      rows: 3
+      first: '2026-10-01'
+      last: '2026-10-01'
+      total: 6000
+    - file: market.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: market_orders
+      rows: 4
+      first: '2026-10-01'
+      last: '2026-10-03'
+      total: 16000
+    review: []

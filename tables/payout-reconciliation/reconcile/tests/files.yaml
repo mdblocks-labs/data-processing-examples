@@ -1,0 +1,138 @@
+# A file that couldn't be decoded, one whose headers match no source, one that matches
+# two, and one with a mapped header twice are listed and left out.
+mdblocks: 1
+given:
+  files:
+  - - file: broken.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: []
+      rows: []
+      error: 'UnicodeDecodeError: invalid start byte'
+  - - file: notes.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      header: [Name, Notes]
+      rows:
+      - [a, b]
+      error: null
+  - - file: both.csv
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      header: [Charge, Created, Amount, Currency, Payout, Paid, Refund]
+      rows: []
+      error: null
+  - - file: two-amounts.csv
+      sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      header: [Charge, Created, Amount, Currency, Payout, Paid, Amount]
+      rows:
+      - [ch1, '2026-10-01', '1.00', usd, P1, '2026-10-02', '9.00']
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-10-02', '8.00', DEPOSIT]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-10-02'
+    months:
+    - month: 2026-10
+      checksum: 66abf63ac77b2a162e2c751d8a61c6fcd88a3e1174ace83247f3abebe04f2846
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 0
+        paid_out: 0
+        orders: 0
+        refunds: 0
+        fees: 0
+        deposits: 1
+        deposited: 800
+        matched: 0
+        open_payouts: 0
+        open_deposits: 1
+        in_transit: 0
+    payouts: []
+    evidence:
+    - month: 2026-10
+      status: no payout
+      file: bank.csv
+      row: 2
+      source: bank
+      kind: bank
+      id: T1
+      date: '2026-10-02'
+      amount: 800
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: DEPOSIT
+      bank_file: null
+      bank_row: null
+    files:
+    - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: bank
+      rows: 1
+      first: '2026-10-02'
+      last: '2026-10-02'
+      total: 800
+    - file: both.csv
+      sha256: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      source: null
+      rows: 0
+      first: null
+      last: null
+      total: 0
+    - file: broken.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: null
+      rows: 0
+      first: null
+      last: null
+      total: 0
+    - file: notes.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      source: null
+      rows: 0
+      first: null
+      last: null
+      total: 0
+    - file: two-amounts.csv
+      sha256: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      source: card_orders
+      rows: 0
+      first: null
+      last: null
+      total: 0
+    review:
+    - file: both.csv
+      row: null
+      problem: its headers match card_orders and card_refunds; make one source's headers differ
+    - file: broken.csv
+      row: null
+      problem: 'not read: UnicodeDecodeError: invalid start byte'
+    - file: notes.csv
+      row: null
+      problem: its headers match no source in sources.json; row 2 left out
+    - file: two-amounts.csv
+      row: null
+      problem: has more than one 'Amount' column; row 2 left out
+  summary:
+    merchant: Test Co
+    currency: USD
+    bank_through: '2026-10-02'
+    months:
+    - month: 2026-10
+      status: not approved
+      open_payouts: 0
+      open_deposits: 1
+      in_transit: 0

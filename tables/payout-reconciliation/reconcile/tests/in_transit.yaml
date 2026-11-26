@@ -1,0 +1,231 @@
+# A payout with no deposit is in transit until the bank rows reach match_days (3)
+# past its date, then no deposit. The bank rows reach 2026-10-10: P1 (2026-10-07) has
+# waited three days and has no deposit; P2 (2026-10-08) and P3, dated after the last
+# bank row, are in transit. A deposit outside the window of M1's amount stays open on
+# both sides: dated 4 days after it, it is no payout.
+mdblocks: 1
+given:
+  files:
+  - - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-06', '10.00', usd, P1, '2026-10-07']
+      - [ch2, '2026-10-07', '20.00', usd, P2, '2026-10-08']
+      - [ch3, '2026-10-09', '30.00', usd, P3, '2026-10-12']
+      error: null
+  - - file: market.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Date, Total, Settlement, Settled]
+      rows:
+      - [M-1, 10/01/2026, '40.00', M1, 10/02/2026]
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-10-06', '40.00', MARKET CREDIT]
+      - [T2, '2026-10-10', '-5.00', SERVICE FEE]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-10-10'
+    months:
+    - month: 2026-10
+      checksum: 0dfe2fbfe7851b272ae47b18982c9065180c051631a97d19d708bdd4b1f10283
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 4
+        paid_out: 10000
+        orders: 10000
+        refunds: 0
+        fees: 0
+        deposits: 1
+        deposited: 4000
+        matched: 0
+        open_payouts: 2
+        open_deposits: 1
+        in_transit: 2
+    payouts:
+    - processor: card
+      payout_id: P1
+      date: '2026-10-07'
+      dates: ['2026-10-07']
+      month: 2026-10
+      amount: 1000
+      orders: 1000
+      refunds: 0
+      fees: 0
+      status: no deposit
+      bank: null
+      difference: null
+    - processor: card
+      payout_id: P2
+      date: '2026-10-08'
+      dates: ['2026-10-08']
+      month: 2026-10
+      amount: 2000
+      orders: 2000
+      refunds: 0
+      fees: 0
+      status: in transit
+      bank: null
+      difference: null
+    - processor: card
+      payout_id: P3
+      date: '2026-10-12'
+      dates: ['2026-10-12']
+      month: 2026-10
+      amount: 3000
+      orders: 3000
+      refunds: 0
+      fees: 0
+      status: in transit
+      bank: null
+      difference: null
+    - processor: market
+      payout_id: M1
+      date: '2026-10-02'
+      dates: ['2026-10-02']
+      month: 2026-10
+      amount: 4000
+      orders: 4000
+      refunds: 0
+      fees: 0
+      status: no deposit
+      bank: null
+      difference: null
+    evidence:
+    - month: 2026-10
+      status: no payout
+      file: bank.csv
+      row: 2
+      source: bank
+      kind: bank
+      id: T1
+      date: '2026-10-06'
+      amount: 4000
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: MARKET CREDIT
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: not a deposit
+      file: bank.csv
+      row: 3
+      source: bank
+      kind: bank
+      id: T2
+      date: '2026-10-10'
+      amount: -500
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: SERVICE FEE
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: no deposit
+      file: card.csv
+      row: 2
+      source: card_orders
+      kind: orders
+      id: ch1
+      date: '2026-10-06'
+      amount: 1000
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-07'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: in transit
+      file: card.csv
+      row: 3
+      source: card_orders
+      kind: orders
+      id: ch2
+      date: '2026-10-07'
+      amount: 2000
+      processor: card
+      payout_id: P2
+      payout_date: '2026-10-08'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: in transit
+      file: card.csv
+      row: 4
+      source: card_orders
+      kind: orders
+      id: ch3
+      date: '2026-10-09'
+      amount: 3000
+      processor: card
+      payout_id: P3
+      payout_date: '2026-10-12'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: no deposit
+      file: market.csv
+      row: 2
+      source: market_orders
+      kind: orders
+      id: M-1
+      date: '2026-10-01'
+      amount: 4000
+      processor: market
+      payout_id: M1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: null
+      bank_row: null
+    files:
+    - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: bank
+      rows: 2
+      first: '2026-10-06'
+      last: '2026-10-10'
+      total: 3500
+    - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_orders
+      rows: 3
+      first: '2026-10-06'
+      last: '2026-10-09'
+      total: 6000
+    - file: market.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: market_orders
+      rows: 1
+      first: '2026-10-01'
+      last: '2026-10-01'
+      total: 4000
+    review: []
+  summary:
+    merchant: Test Co
+    currency: USD
+    bank_through: '2026-10-10'
+    months:
+    - month: 2026-10
+      status: not approved
+      open_payouts: 2
+      open_deposits: 1
+      in_transit: 2

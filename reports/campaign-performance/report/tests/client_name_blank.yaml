@@ -1,0 +1,11 @@
+# A client.json whose name is blank stops the run, naming the field.
+mdblocks: 1
+given:
+  files: []
+  sources: "@sources.json"
+  client: {name: "  ", currency: USD, target_cost_per_sale: "100.00"}
+  previous: null
+params:
+  week_ending: "2026-11-28"
+expect_state: failed
+expect_error: harness_error

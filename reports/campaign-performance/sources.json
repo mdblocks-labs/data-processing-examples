@@ -1,0 +1,29 @@
+{
+  "google_ads": {
+    "kind": "spend",
+    "columns": {"date": "Day", "campaign": "Campaign", "spend": "Cost", "currency": "Currency code"},
+    "date_format": "%Y-%m-%d"
+  },
+  "meta_ads": {
+    "kind": "spend",
+    "columns": {"date": "Reporting starts", "campaign": "Campaign name", "spend": "Amount spent (EUR)"},
+    "currency": "EUR",
+    "date_format": "%d/%m/%Y"
+  },
+  "crm": {
+    "kind": "leads",
+    "columns": {"lead": "Lead ID", "date": "Created", "campaign": "UTM Campaign", "stage": "Stage", "deal": "Deal ID"},
+    "won": ["Closed Won"],
+    "date_format": "%m/%d/%Y %H:%M"
+  },
+  "sales": {
+    "kind": "sales",
+    "columns": {"order": "order_id", "deal": "deal_id", "date": "order_date", "revenue": "revenue", "cost": "cost_of_goods", "refund": "refunded", "currency": "currency"},
+    "date_format": "%Y-%m-%d"
+  },
+  "rates": {
+    "kind": "rates",
+    "columns": {"date": "date", "currency": "currency", "rate": "rate"},
+    "date_format": "%Y-%m-%d"
+  }
+}

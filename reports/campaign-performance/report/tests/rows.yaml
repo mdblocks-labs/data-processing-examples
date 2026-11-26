@@ -1,0 +1,153 @@
+# Each row that can't be used is listed with its file and row and left out: a bad date,
+# amount or currency, an amount too large, the wrong number of cells, no campaign or id,
+# a refund above the revenue. Blank rows are skipped; a lower-case currency is accepted.
+mdblocks: 1
+given:
+  files:
+  - - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-31', Brand, '10.00', USD]
+      - ['2026-11-02', Brand, '1,0.00', USD]
+      - ['2026-11-02', Brand, '10.00', usd!]
+      - ['2026-11-02', '', '10.00', USD]
+      - ['2026-11-02', Brand, '10.00']
+      - ['', '', '', '']
+      - ['2026-11-02', Brand, '1000000000000.00', USD]
+      - ['2026-11-28', Brand, '1,234.50', usd]
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - ['', '2026-11-25', Brand, Won, D1]
+      - [L1, '2026-11-25', Brand, Won, D1]
+      error: null
+  - - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - ['', D1, '2026-11-25', '10.00', '1.00', '0.00', USD]
+      - [O1, D1, '2026-11-25', '10.00', '1.00', '11.00', USD]
+      - [O2, D1, '2026-11-26', '2,000.00', '500.00', '0.00', USD]
+      error: null
+  - - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [date, currency, rate]
+      rows:
+      - ['2026-11-01', EUR, '1.10']
+      - ['2026-11-10', EUR, '1.20']
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: null
+params:
+  week_ending: '2026-11-28'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-11-28'
+    period_start: '2026-11-01'
+    totals:
+      spend: '1234.50'
+      sales: 1
+      cost_per_sale: '1234.50'
+      margin: '1500.00'
+      margin_after_spend: '265.50'
+      unattributed_margin: '0.00'
+    campaigns:
+    - campaign: Brand
+      spend: '1234.50'
+      sales: 1
+      cost_per_sale: '1234.50'
+      margin: '1500.00'
+      margin_after_spend: '265.50'
+      recommendation: hold
+      weeks:
+      - week_ending: '2026-11-07'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '1234.50'
+        sales: 1
+        margin: '1500.00'
+    files:
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 1
+      first: '2026-11-25'
+      last: '2026-11-25'
+      totals: {}
+    - file: google.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 1
+      first: '2026-11-28'
+      last: '2026-11-28'
+      totals:
+        USD: '1234.50'
+    - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: rates
+      rows: 2
+      first: '2026-11-01'
+      last: '2026-11-10'
+      totals: {}
+    - file: sales.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 1
+      first: '2026-11-26'
+      last: '2026-11-26'
+      totals:
+        USD: '2000.00'
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'meta: no file in the folder matches its headers'
+    - file: crm.csv
+      row: 2
+      problem: no lead id
+    - file: google.csv
+      row: 2
+      problem: bad date '2026-11-31'; expected %Y-%m-%d
+    - file: google.csv
+      row: 3
+      problem: bad amount '1,0.00'
+    - file: google.csv
+      row: 4
+      problem: bad currency 'USD!'
+    - file: google.csv
+      row: 5
+      problem: no campaign
+    - file: google.csv
+      row: 6
+      problem: has 3 cells; the header has 4
+    - file: google.csv
+      row: 8
+      problem: amount '1000000000000.00' is too large
+    - file: sales.csv
+      row: 2
+      problem: no order id
+    - file: sales.csv
+      row: 3
+      problem: refund 11.00 is more than the revenue 10.00
+    checksum: 93ef9e23ca54534231cf9d2560ee6129a67df707f64aee32166e01b2c271ba9e

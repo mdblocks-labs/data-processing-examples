@@ -1,0 +1,11 @@
+# A week_ending that names a week, not a day, stops the run rather than picking its Monday.
+mdblocks: 1
+given:
+  files: []
+  sources: "@sources.json"
+  client: {name: Test Co, currency: USD, target_cost_per_sale: "100.00"}
+  previous: null
+params:
+  week_ending: "2026-W47"
+expect_state: failed
+expect_error: harness_error

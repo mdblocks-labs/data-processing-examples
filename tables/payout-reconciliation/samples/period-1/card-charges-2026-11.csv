@@ -1,0 +1,6 @@
+Charge ID,Created,Amount,Currency,Payout ID,Payout Date
+ch_0310,2026-11-01,32.00,usd,PO-C1010,2026-11-02
+ch_0311,2026-11-01,46.75,usd,PO-C1010,2026-11-02
+ch_0320,2026-11-02,58.00,usd,,
+ch_0321,2026-11-02,29.00,usd,,
+ch_0322,2026-11-02,18.00,usd,,

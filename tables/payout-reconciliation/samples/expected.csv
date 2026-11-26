@@ -1,0 +1,9 @@
+preset,month,side,status,processor,payout_id,date,expected,deposit,difference
+period-1,2026-10,payout,amount differs,card,PO-C1005,2026-10-15,192.16,188.66,-3.50
+period-1,2026-10,payout,no deposit,marketplace,MS-3002,2026-10-17,323.05,,
+period-1,2026-10,deposit,amount differs,card,PO-C1005,2026-10-16,192.16,188.66,-3.50
+period-1,2026-10,deposit,no payout,,,2026-10-19,,282.05,
+period-1,2026-10,deposit,no payout,,,2026-10-21,,250.00,
+period-2,2026-10,payout,amount differs,card,PO-C1005,2026-10-15,192.16,188.66,-3.50
+period-2,2026-10,deposit,amount differs,card,PO-C1005,2026-10-16,192.16,188.66,-3.50
+period-2,2026-10,deposit,no payout,,,2026-10-21,,250.00,

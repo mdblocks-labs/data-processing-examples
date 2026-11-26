@@ -1,0 +1,53 @@
+# The dataset's last October row has the checksum October is approved with: nothing to add.
+mdblocks: 1
+given:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-11-04'
+    months:
+    - month: 2026-10
+      checksum: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      status: approved
+      approvals:
+      - row: 2
+        approved_by: A. Reyes
+        approved_on: '2026-11-03'
+        current: true
+      totals:
+        payouts: 2
+        paid_out: 4000
+        orders: 4500
+        refunds: -200
+        fees: -300
+        deposits: 2
+        deposited: 4000
+        matched: 2
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 0
+    - month: 2026-11
+      checksum: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 1
+        paid_out: 1500
+        orders: 1600
+        refunds: 0
+        fees: -100
+        deposits: 0
+        deposited: 0
+        matched: 0
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 1
+    payouts: []
+    evidence: []
+    files: []
+    review: []
+  history: '@history_oct_a.arrow'
+expect:
+  rows: '@unchanged.expected.arrow'
+  kept: []

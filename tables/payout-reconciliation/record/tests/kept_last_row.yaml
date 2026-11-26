@@ -1,0 +1,50 @@
+# October's exports have left the folder after two approvals. Its last row is what the site sees,
+# without a checksum; nothing is appended.
+mdblocks: 1
+given:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-11-04'
+    months:
+    - month: 2026-11
+      checksum: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 1
+        paid_out: 1500
+        orders: 1600
+        refunds: 0
+        fees: -100
+        deposits: 0
+        deposited: 0
+        matched: 0
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 1
+    payouts: []
+    evidence: []
+    files: []
+    review: []
+  history: '@history_oct_a_b.arrow'
+expect:
+  rows: '@kept_last_row.expected.arrow'
+  kept:
+  - month: 2026-10
+    approved_by: B. Chen
+    approved_on: '2026-11-20'
+    currency: USD
+    totals:
+      payouts: 2
+      paid_out: 4000
+      orders: 4500
+      refunds: -200
+      fees: -300
+      deposits: 2
+      deposited: 4000
+      matched: 2
+      open_payouts: 0
+      open_deposits: 0
+      in_transit: 0

@@ -1,0 +1,200 @@
+# A payout whose rows give different payout dates is dates differ, placed by the
+# latest, and tied by ID only. P1's deposit names it, so the deposit is matched and
+# P1 stays open as dates differ. M1's deposit has its amount and date, but M1 can't be
+# tied by amount: both stay open.
+mdblocks: 1
+given:
+  files:
+  - - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-09-29', '10.00', usd, P1, '2026-09-30']
+      - [ch2, '2026-09-30', '15.00', usd, P1, '2026-10-01']
+      error: null
+  - - file: market.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Date, Total, Settlement, Settled]
+      rows:
+      - [M-1, 10/01/2026, '20.00', M1, 10/02/2026]
+      - [M-2, 10/01/2026, '30.00', M1, 10/03/2026]
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-10-02', '25.00', CARD P1]
+      - [T2, '2026-10-04', '50.00', MARKET CREDIT]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-10-04'
+    months:
+    - month: 2026-10
+      checksum: 70f31fb4e023b1b3efe4459fce6220f31ce4c0607da5d78d25cdf40c85ac86b4
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 2
+        paid_out: 7500
+        orders: 7500
+        refunds: 0
+        fees: 0
+        deposits: 2
+        deposited: 7500
+        matched: 0
+        open_payouts: 2
+        open_deposits: 1
+        in_transit: 0
+    payouts:
+    - processor: card
+      payout_id: P1
+      date: '2026-10-01'
+      dates: ['2026-09-30', '2026-10-01']
+      month: 2026-10
+      amount: 2500
+      orders: 2500
+      refunds: 0
+      fees: 0
+      status: dates differ
+      bank:
+        file: bank.csv
+        row: 2
+        date: '2026-10-02'
+        amount: 2500
+      difference: 0
+    - processor: market
+      payout_id: M1
+      date: '2026-10-03'
+      dates: ['2026-10-02', '2026-10-03']
+      month: 2026-10
+      amount: 5000
+      orders: 5000
+      refunds: 0
+      fees: 0
+      status: dates differ
+      bank: null
+      difference: null
+    evidence:
+    - month: 2026-10
+      status: matched
+      file: bank.csv
+      row: 2
+      source: bank
+      kind: bank
+      id: T1
+      date: '2026-10-02'
+      amount: 2500
+      processor: card
+      payout_id: P1
+      payout_date: null
+      description: CARD P1
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: no payout
+      file: bank.csv
+      row: 3
+      source: bank
+      kind: bank
+      id: T2
+      date: '2026-10-04'
+      amount: 5000
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: MARKET CREDIT
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: dates differ
+      file: card.csv
+      row: 2
+      source: card_orders
+      kind: orders
+      id: ch1
+      date: '2026-09-29'
+      amount: 1000
+      processor: card
+      payout_id: P1
+      payout_date: '2026-09-30'
+      description: null
+      bank_file: bank.csv
+      bank_row: 2
+    - month: 2026-10
+      status: dates differ
+      file: card.csv
+      row: 3
+      source: card_orders
+      kind: orders
+      id: ch2
+      date: '2026-09-30'
+      amount: 1500
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-01'
+      description: null
+      bank_file: bank.csv
+      bank_row: 2
+    - month: 2026-10
+      status: dates differ
+      file: market.csv
+      row: 2
+      source: market_orders
+      kind: orders
+      id: M-1
+      date: '2026-10-01'
+      amount: 2000
+      processor: market
+      payout_id: M1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: dates differ
+      file: market.csv
+      row: 3
+      source: market_orders
+      kind: orders
+      id: M-2
+      date: '2026-10-01'
+      amount: 3000
+      processor: market
+      payout_id: M1
+      payout_date: '2026-10-03'
+      description: null
+      bank_file: null
+      bank_row: null
+    files:
+    - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: bank
+      rows: 2
+      first: '2026-10-02'
+      last: '2026-10-04'
+      total: 7500
+    - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_orders
+      rows: 2
+      first: '2026-09-29'
+      last: '2026-09-30'
+      total: 2500
+    - file: market.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: market_orders
+      rows: 2
+      first: '2026-10-01'
+      last: '2026-10-01'
+      total: 5000
+    review: []

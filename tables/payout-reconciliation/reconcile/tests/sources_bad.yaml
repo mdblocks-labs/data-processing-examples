@@ -1,0 +1,23 @@
+# A sources.json setting of the wrong type stops the run, naming the source and field.
+mdblocks: 1
+given:
+  files: []
+  sources:
+    returns:
+      kind: refunds
+      processor: card
+      date_format: '%Y-%m-%d'
+      negate: 'yes'
+      columns:
+        id: R
+        date: D
+        amount: A
+        payout_id: P
+        payout_date: PD
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect_state: failed
+expect_error: harness_error

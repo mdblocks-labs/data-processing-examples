@@ -1,0 +1,13 @@
+preset,campaign,spend,qualified_sales,cost_per_sale,margin_after_spend,recommendation,changed_by
+period-1,Prospecting - Spring,1025.02,6,170.84,210.98,hold,
+period-1,Retargeting - Cart,446.18,21,21.25,1044.82,scale,
+period-1,Search - Brand,1158.67,17,68.16,388.33,scale,
+period-1,Search - Tents,2456.96,11,223.36,-1180.96,cut,
+period-1,Shopping - Boots,1738.02,18,96.56,905.98,scale,
+period-2,Prospecting - Spring,991.64,9,110.18,862.36,scale,new week
+period-2,Retargeting - Cart,431.65,22,19.62,1130.35,scale,
+period-2,Search - Brand,1162.00,17,68.35,385.00,scale,
+period-2,Search - Tents,2464.00,13,189.54,-956.00,cut,
+period-2,Shopping - Boots,1743.00,17,102.53,-579.00,cut,corrected export
+harbor-lane,Search - Emergency,1163.20,14,83.09,446.80,scale,
+harbor-lane,Search - Implants,3101.86,3,1033.95,1308.14,hold,

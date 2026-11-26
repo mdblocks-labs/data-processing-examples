@@ -1,0 +1,180 @@
+# An ID repeated within a source counts once: the last by file path, then by row. ch1
+# is in a.csv and b.csv, so b.csv's counts; ch2 is twice in b.csv, so the second
+# counts. The others are listed. A charge and a refund may share an ID, being other
+# sources. Each file's total is of the rows it could read, before repeats are dropped.
+mdblocks: 1
+given:
+  files:
+  - - file: b/card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-01', '12.00', usd, P1, '2026-10-02']
+      - [ch2, '2026-10-01', '5.00', usd, P1, '2026-10-02']
+      - [ch2, '2026-10-01', '6.00', usd, P1, '2026-10-02']
+      error: null
+  - - file: a/card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-01', '10.00', usd, P1, '2026-10-02']
+      error: null
+  - - file: refunds.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Refund, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-01', '-1.00', usd, P1, '2026-10-02']
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-10-03', '17.00', CARD P1]
+      - [T1, '2026-10-03', '17.00', CARD P1]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-10-03'
+    months:
+    - month: 2026-10
+      checksum: efce67c6654f004d8c21b81e0177781a83d8789c301fb1c09f1c06f19bcf1f00
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 1
+        paid_out: 1700
+        orders: 1800
+        refunds: -100
+        fees: 0
+        deposits: 1
+        deposited: 1700
+        matched: 1
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 0
+    payouts:
+    - processor: card
+      payout_id: P1
+      date: '2026-10-02'
+      dates: ['2026-10-02']
+      month: 2026-10
+      amount: 1700
+      orders: 1800
+      refunds: -100
+      fees: 0
+      status: matched
+      bank:
+        file: bank.csv
+        row: 3
+        date: '2026-10-03'
+        amount: 1700
+      difference: 0
+    evidence:
+    - month: 2026-10
+      status: matched
+      file: b/card.csv
+      row: 2
+      source: card_orders
+      kind: orders
+      id: ch1
+      date: '2026-10-01'
+      amount: 1200
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: bank.csv
+      bank_row: 3
+    - month: 2026-10
+      status: matched
+      file: b/card.csv
+      row: 4
+      source: card_orders
+      kind: orders
+      id: ch2
+      date: '2026-10-01'
+      amount: 600
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: bank.csv
+      bank_row: 3
+    - month: 2026-10
+      status: matched
+      file: bank.csv
+      row: 3
+      source: bank
+      kind: bank
+      id: T1
+      date: '2026-10-03'
+      amount: 1700
+      processor: card
+      payout_id: P1
+      payout_date: null
+      description: CARD P1
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: matched
+      file: refunds.csv
+      row: 2
+      source: card_refunds
+      kind: refunds
+      id: ch1
+      date: '2026-10-01'
+      amount: -100
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-02'
+      description: null
+      bank_file: bank.csv
+      bank_row: 3
+    files:
+    - file: a/card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_orders
+      rows: 1
+      first: '2026-10-01'
+      last: '2026-10-01'
+      total: 1000
+    - file: b/card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_orders
+      rows: 3
+      first: '2026-10-01'
+      last: '2026-10-01'
+      total: 2300
+    - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: bank
+      rows: 2
+      first: '2026-10-03'
+      last: '2026-10-03'
+      total: 3400
+    - file: refunds.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_refunds
+      rows: 1
+      first: '2026-10-01'
+      last: '2026-10-01'
+      total: -100
+    review:
+    - file: a/card.csv
+      row: 2
+      problem: card_orders ID ch1 is repeated in b/card.csv row 2, which is counted
+    - file: b/card.csv
+      row: 3
+      problem: card_orders ID ch2 is repeated in b/card.csv row 4, which is counted
+    - file: bank.csv
+      row: 2
+      problem: bank ID T1 is repeated in bank.csv row 3, which is counted

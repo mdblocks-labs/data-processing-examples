@@ -1,0 +1,8 @@
+# A second client, Harbor Lane Dental, reported in euros. It runs no Meta ads,
+# so it has its own sources file without them.
+in:
+  sources: ../samples/harbor-lane/sources.json
+params:
+  folder: samples/harbor-lane
+  week_ending: "2026-11-22"
+runner: local

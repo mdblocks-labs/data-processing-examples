@@ -1,0 +1,12 @@
+# A target with fractional cents stops the run: the report would compare one target and
+# show another.
+mdblocks: 1
+given:
+  files: []
+  sources: "@sources.json"
+  client: {name: Test Co, currency: USD, target_cost_per_sale: "68.159"}
+  previous: null
+params:
+  week_ending: "2026-11-28"
+expect_state: failed
+expect_error: harness_error

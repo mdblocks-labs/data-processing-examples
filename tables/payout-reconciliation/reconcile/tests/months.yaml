@@ -1,0 +1,250 @@
+# Every month gets its own totals and checksum. A payout is placed by its payout date
+# and a bank row by its own: P1 is paid out on 2026-10-31 and deposited on 2026-11-02,
+# so its rows count in October and the deposit in November. The deposit is still tied.
+mdblocks: 1
+given:
+  files:
+  - - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Charge, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [ch1, '2026-10-29', '40.00', usd, P1, '2026-10-31']
+      - [ch2, '2026-10-30', '12.00', usd, P1, '2026-10-31']
+      - [ch3, '2026-11-02', '15.00', usd, P2, '2026-11-03']
+      error: null
+  - - file: card-fees.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Fee, Created, Amount, Currency, Payout, Paid]
+      rows:
+      - [fe1, '2026-10-31', '-1.20', usd, P1, '2026-10-31']
+      error: null
+  - - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Transaction, Posted, Amount, Description]
+      rows:
+      - [T1, '2026-11-02', '50.80', CARD P1]
+      - [T2, '2026-11-04', '15.00', CARD P2]
+      - [T3, '2026-10-15', '-9.00', FEE]
+      error: null
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+    match_days: 3
+  approvals: null
+expect:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-11-04'
+    months:
+    - month: 2026-10
+      checksum: 491fb5b30e27602b9a8b6cb71a1ce426e61fe8595319e3c225414a570afdd59f
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 1
+        paid_out: 5080
+        orders: 5200
+        refunds: 0
+        fees: -120
+        deposits: 0
+        deposited: 0
+        matched: 1
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 0
+    - month: 2026-11
+      checksum: 4cfd1e1a4a2b30b94228e7b6ffd1c00954e782b2177e6ece3fb1d0dc88e64bc5
+      status: not approved
+      approvals: []
+      totals:
+        payouts: 1
+        paid_out: 1500
+        orders: 1500
+        refunds: 0
+        fees: 0
+        deposits: 2
+        deposited: 6580
+        matched: 1
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 0
+    payouts:
+    - processor: card
+      payout_id: P1
+      date: '2026-10-31'
+      dates: ['2026-10-31']
+      month: 2026-10
+      amount: 5080
+      orders: 5200
+      refunds: 0
+      fees: -120
+      status: matched
+      bank:
+        file: bank.csv
+        row: 2
+        date: '2026-11-02'
+        amount: 5080
+      difference: 0
+    - processor: card
+      payout_id: P2
+      date: '2026-11-03'
+      dates: ['2026-11-03']
+      month: 2026-11
+      amount: 1500
+      orders: 1500
+      refunds: 0
+      fees: 0
+      status: matched
+      bank:
+        file: bank.csv
+        row: 3
+        date: '2026-11-04'
+        amount: 1500
+      difference: 0
+    evidence:
+    - month: 2026-11
+      status: matched
+      file: bank.csv
+      row: 2
+      source: bank
+      kind: bank
+      id: T1
+      date: '2026-11-02'
+      amount: 5080
+      processor: card
+      payout_id: P1
+      payout_date: null
+      description: CARD P1
+      bank_file: null
+      bank_row: null
+    - month: 2026-11
+      status: matched
+      file: bank.csv
+      row: 3
+      source: bank
+      kind: bank
+      id: T2
+      date: '2026-11-04'
+      amount: 1500
+      processor: card
+      payout_id: P2
+      payout_date: null
+      description: CARD P2
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: not a deposit
+      file: bank.csv
+      row: 4
+      source: bank
+      kind: bank
+      id: T3
+      date: '2026-10-15'
+      amount: -900
+      processor: null
+      payout_id: null
+      payout_date: null
+      description: FEE
+      bank_file: null
+      bank_row: null
+    - month: 2026-10
+      status: matched
+      file: card-fees.csv
+      row: 2
+      source: card_fees
+      kind: fees
+      id: fe1
+      date: '2026-10-31'
+      amount: -120
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-31'
+      description: null
+      bank_file: bank.csv
+      bank_row: 2
+    - month: 2026-10
+      status: matched
+      file: card.csv
+      row: 2
+      source: card_orders
+      kind: orders
+      id: ch1
+      date: '2026-10-29'
+      amount: 4000
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-31'
+      description: null
+      bank_file: bank.csv
+      bank_row: 2
+    - month: 2026-10
+      status: matched
+      file: card.csv
+      row: 3
+      source: card_orders
+      kind: orders
+      id: ch2
+      date: '2026-10-30'
+      amount: 1200
+      processor: card
+      payout_id: P1
+      payout_date: '2026-10-31'
+      description: null
+      bank_file: bank.csv
+      bank_row: 2
+    - month: 2026-11
+      status: matched
+      file: card.csv
+      row: 4
+      source: card_orders
+      kind: orders
+      id: ch3
+      date: '2026-11-02'
+      amount: 1500
+      processor: card
+      payout_id: P2
+      payout_date: '2026-11-03'
+      description: null
+      bank_file: bank.csv
+      bank_row: 3
+    files:
+    - file: bank.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: bank
+      rows: 3
+      first: '2026-10-15'
+      last: '2026-11-04'
+      total: 5680
+    - file: card-fees.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_fees
+      rows: 1
+      first: '2026-10-31'
+      last: '2026-10-31'
+      total: -120
+    - file: card.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: card_orders
+      rows: 3
+      first: '2026-10-29'
+      last: '2026-11-02'
+      total: 6700
+    review: []
+  summary:
+    merchant: Test Co
+    currency: USD
+    bank_through: '2026-11-04'
+    months:
+    - month: 2026-10
+      status: not approved
+      open_payouts: 0
+      open_deposits: 0
+      in_transit: 0
+    - month: 2026-11
+      status: not approved
+      open_payouts: 0
+      open_deposits: 0
+      in_transit: 0

@@ -1,0 +1,37 @@
+# A corrected export put October's approval out of date: the dataset keeps its row, adds nothing.
+mdblocks: 1
+given:
+  report:
+    merchant: Test Co
+    currency: USD
+    match_days: 3
+    bank_through: '2026-11-04'
+    months:
+    - month: 2026-10
+      checksum: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      status: approval out of date
+      approvals:
+      - row: 2
+        approved_by: A. Reyes
+        approved_on: '2026-11-03'
+        current: false
+      totals:
+        payouts: 2
+        paid_out: 4000
+        orders: 4500
+        refunds: -200
+        fees: -300
+        deposits: 2
+        deposited: 4000
+        matched: 2
+        open_payouts: 0
+        open_deposits: 0
+        in_transit: 0
+    payouts: []
+    evidence: []
+    files: []
+    review: []
+  history: '@history_oct_a.arrow'
+expect:
+  rows: '@out_of_date.expected.arrow'
+  kept: []

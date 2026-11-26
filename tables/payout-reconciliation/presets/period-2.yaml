@@ -1,0 +1,11 @@
+# Lantern & Loom Candle Co., the exports pulled on 2026-11-20, with October approved.
+# Paths in `in:` resolve against this file's directory; `folder` is read from the
+# workflow folder.
+in:
+  sources: ../sources.json
+  history: dataset://approved_totals@main
+params:
+  folder: samples/period-2
+runner: local
+out:
+  new_approvals: dataset://approved_totals@main

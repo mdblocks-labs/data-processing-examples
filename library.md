@@ -1,6 +1,5 @@
 ---
 mdblocks: 1
-type: mdblocks/library
 name: Example mdBlocks workflows for data processing
 description: Invoices, as PDFs, scans or photos, read into tables and an Excel workbook on your own machine.
 license: MIT

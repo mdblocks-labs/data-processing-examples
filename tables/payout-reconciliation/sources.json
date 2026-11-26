@@ -1,0 +1,45 @@
+{
+  "card_charges": {
+    "kind": "orders",
+    "processor": "card",
+    "columns": {"id": "Charge ID", "date": "Created", "amount": "Amount", "currency": "Currency", "payout_id": "Payout ID", "payout_date": "Payout Date"},
+    "date_format": "%Y-%m-%d"
+  },
+  "card_refunds": {
+    "kind": "refunds",
+    "processor": "card",
+    "columns": {"id": "Refund ID", "date": "Created", "amount": "Amount", "currency": "Currency", "payout_id": "Payout ID", "payout_date": "Payout Date"},
+    "date_format": "%Y-%m-%d"
+  },
+  "card_fees": {
+    "kind": "fees",
+    "processor": "card",
+    "columns": {"id": "Fee ID", "date": "Created", "amount": "Amount", "currency": "Currency", "payout_id": "Payout ID", "payout_date": "Payout Date"},
+    "date_format": "%Y-%m-%d"
+  },
+  "market_orders": {
+    "kind": "orders",
+    "processor": "marketplace",
+    "columns": {"id": "Order Number", "date": "Order Date", "amount": "Item Total", "payout_id": "Settlement ID", "payout_date": "Settlement Date"},
+    "date_format": "%m/%d/%Y"
+  },
+  "market_refunds": {
+    "kind": "refunds",
+    "processor": "marketplace",
+    "columns": {"id": "Return Number", "date": "Return Date", "amount": "Refund Amount", "payout_id": "Settlement ID", "payout_date": "Settlement Date"},
+    "date_format": "%m/%d/%Y",
+    "negate": true
+  },
+  "market_fees": {
+    "kind": "fees",
+    "processor": "marketplace",
+    "columns": {"id": "Fee Reference", "date": "Fee Date", "amount": "Fee Amount", "payout_id": "Settlement ID", "payout_date": "Settlement Date"},
+    "date_format": "%m/%d/%Y",
+    "negate": true
+  },
+  "bank": {
+    "kind": "bank",
+    "columns": {"id": "Transaction ID", "date": "Posted Date", "amount": "Amount", "description": "Description"},
+    "date_format": "%Y-%m-%d"
+  }
+}

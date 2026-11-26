@@ -1,0 +1,11 @@
+# A merchant.json without match_days stops the run.
+mdblocks: 1
+given:
+  files: []
+  sources: '@sources.json'
+  merchant:
+    name: Test Co
+    currency: USD
+  approvals: null
+expect_state: failed
+expect_error: harness_error

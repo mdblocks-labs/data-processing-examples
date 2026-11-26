@@ -1,0 +1,8 @@
+# Alder & Pine Outfitters, the report for the week ending 2026-11-22. Paths in `in:`
+# resolve against this file's directory; `folder` is read from the workflow folder.
+in:
+  sources: ../sources.json
+params:
+  folder: samples/alder-pine/period-2
+  week_ending: "2026-11-22"
+runner: local

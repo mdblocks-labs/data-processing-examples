@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Client campaign report</title>
+  <link rel="stylesheet" href="mdb.css" />
+  <script src="mdb.js"></script>
+  <style>
+    /* Layout only; every colour is a token from `mdb.css`. */
+    .kpis { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+    .kpi .name { font-size: 12px; color: var(--mdb-text-muted); }
+    .kpi .value { font-size: 24px; font-variant-numeric: tabular-nums; }
+    .kpi .was { font-size: 12px; color: var(--mdb-text-muted); margin-top: 2px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+    .chip { font: inherit; font-size: 13px; padding: 3px 10px; border-radius: 999px; cursor: pointer;
+            border: 1px solid var(--mdb-border-strong); background: var(--mdb-surface); color: var(--mdb-text); }
+    .chip[aria-pressed="true"] { border-color: var(--mdb-primary-strong); background: var(--mdb-primary-soft); color: var(--mdb-primary); }
+    .chip .n { color: var(--mdb-text-muted); margin-left: 4px; font-variant-numeric: tabular-nums; }
+    .scroll { overflow-x: auto; }
+    table.grid { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    table.grid th, table.grid td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--mdb-border); vertical-align: top; }
+    table.grid td.num, table.grid th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    table.grid th { font-weight: 600; font-size: 12px; color: var(--mdb-text-muted); white-space: nowrap; }
+    th button.sort { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+    th button.sort:hover, th button.sort:focus-visible { color: var(--mdb-primary); }
+    th[aria-sort] button.sort { color: var(--mdb-text); }
+    button.open { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; color: var(--mdb-primary); text-align: left; }
+    button.open::before { content: "▸"; display: inline-block; width: 1em; color: var(--mdb-text-muted); }
+    button.open[aria-expanded="true"]::before { content: "▾"; }
+    tr.detail > td { background: var(--mdb-surface-2); }
+    .rec { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; white-space: nowrap; }
+    .rec svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .rec.scale { color: var(--mdb-success); }
+    .rec.hold { color: var(--mdb-attention); }
+    .rec.cut { color: var(--mdb-alert); }
+    .why { font-size: 12.5px; color: var(--mdb-text-muted); }
+    .why b { color: var(--mdb-text); font-weight: 600; }
+    .neg { color: var(--mdb-alert); }
+    .detail-body { display: grid; gap: 16px; grid-template-columns: minmax(260px, 380px) 1fr; padding: 6px 0; }
+    @media (max-width: 720px) { .detail-body { grid-template-columns: 1fr; } }
+    .legend { display: flex; gap: 14px; font-size: 12px; color: var(--mdb-text-muted); margin-top: 4px; }
+    .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 4px; vertical-align: -1px; }
+    .muted { color: var(--mdb-text-muted); }
+    ul.plain { margin: 4px 0 0; padding-left: 18px; }
+    .three { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin-bottom: 10px; }
+    .ok { color: var(--mdb-success); font-weight: 600; }
+    .margin-bar { fill: var(--mdb-type-table); }
+    .mdb-prov { overflow-wrap: anywhere; }
+    .chart { max-width: 380px; }
+  </style>
+</head>
+<body>
+<main class="mdb-site">
+  <h1 id="title">Client campaign report</h1>
+  <p class="mdb-prov" id="page"></p>
+
+  <div class="kpis" id="kpis"></div>
+
+  <h2>Actions</h2>
+  <p class="mdb-prov" data-prov="report.report"></p>
+  <div id="actions"></div>
+
+  <h2>Since the last report</h2>
+  <div id="changes"></div>
+
+  <h2>Needs a look before sending</h2>
+  <div id="review"></div>
+
+  <h2>Source totals</h2>
+  <div id="files"></div>
+
+  <h2>Work this run</h2>
+  <div id="work"></div>
+</main>
+<script type="module">
+  /// <reference path="mdb.d.ts" />
+  const at = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => {
+    const node = Object.assign(document.createElement(tag), props);
+    node.append(...children.filter((c) => c != null));
+    return node;
+  };
+  const SVG = "http://www.w3.org/2000/svg";
+  const svg = (tag, attrs = {}) => {
+    const node = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  };
+
+  const absent = (node, endpoint, err) => {
+    node.replaceChildren(el("div", {
+      className: "mdb-absent",
+      textContent: err.absent
+        ? `${endpoint}: no value — ${err.absent}${err.reason ? ` (${err.reason})` : ""}`
+        : `${endpoint}: ${err.message}`,
+    }));
+  };
+
+  // Lucide paths: trending-up, pause, trending-down.
+  const GLYPHS = {
+    scale: ["M22 7 13.5 15.5 8.5 10.5 2 17", "M16 7h6v6"],
+    hold: ["M8 5v14", "M16 5v14"],
+    cut: ["M22 17 13.5 8.5 8.5 13.5 2 7", "M16 17h6v-6"],
+  };
+  const WORD = { scale: "Scale", hold: "Hold", cut: "Cut" };
+  const ORDER = { cut: 0, hold: 1, scale: 2 };
+  const rec = (name) => {
+    if (!name) return el("span", { className: "muted", textContent: "—" });
+    const icon = svg("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" });
+    for (const d of GLYPHS[name]) icon.append(svg("path", { d }));
+    const chip = el("span", { className: `rec ${name}` }, icon, WORD[name]);
+    return chip;
+  };
+
+  let money = (v) => v;
+  // Changed against what the client was sent; the detail keeps any step in between.
+  const changed = (c) => (c.changed_by ?? []).length > 0
+    && (c.previous?.recommendation ?? null) !== (c.recommendation ?? null);
+  const num = (v) => (v == null ? null : Number(v));
+  const amount = (v) => (v == null ? "—" : money(Number(v)));
+  const signed = (v) => el("span", { className: Number(v) < 0 ? "neg" : "", textContent: amount(v) });
+
+  // Element by element for an array key (currency, then amount).
+  const compare = (x, y) => {
+    if (Array.isArray(x)) {
+      for (let i = 0; i < x.length; i++) { const c = compare(x[i], y[i]); if (c) return c; }
+      return 0;
+    }
+    return x < y ? -1 : x > y ? 1 : 0;
+  };
+
+  // A table whose headers sort it; `cols` are {key, label, num, cell(row), value(row)}.
+  function sortable(cols, rows, { initial, after } = {}) {
+    let sort = initial ?? { key: cols[0].key, dir: 1 };
+    const table = el("table", { className: "grid" });
+    const head = el("tr");
+    const body = el("tbody");
+    table.append(el("thead", {}, head), body);
+    const draw = () => {
+      head.replaceChildren(...cols.map((c) => {
+        const th = el("th", { className: c.num ? "num" : "", scope: "col" });
+        if (sort.key === c.key) th.setAttribute("aria-sort", sort.dir > 0 ? "ascending" : "descending");
+        const arrow = sort.key === c.key ? (sort.dir > 0 ? " ↑" : " ↓") : "";
+        th.append(el("button", {
+          className: "sort", type: "button", textContent: c.label + arrow,
+          title: `Sort by ${c.label.toLowerCase()}`,
+          onclick: () => { sort = { key: c.key, dir: sort.key === c.key ? -sort.dir : 1 }; draw(); },
+        }));
+        return th;
+      }));
+      const col = cols.find((c) => c.key === sort.key);
+      const value = col.value ?? ((r) => r[col.key]);
+      const sorted = [...rows].sort((a, b) => {
+        const x = value(a), y = value(b);
+        if (x == null && y == null) return 0;
+        if (x == null) return 1;
+        if (y == null) return -1;
+        return compare(x, y) * sort.dir;
+      });
+      body.replaceChildren();
+      for (const row of sorted) {
+        const tr = el("tr", {}, ...cols.map((c) => {
+          const td = el("td", { className: c.num ? "num" : "" });
+          const cell = c.cell ? c.cell(row) : row[c.key];
+          td.append(cell instanceof Node ? cell : String(cell ?? "—"));
+          return td;
+        }));
+        body.append(tr);
+        after?.(row, tr, body, cols.length);
+      }
+    };
+    draw();
+    return { table, draw };
+  }
+
+  function kpi(name, value, was) {
+    return el("div", { className: "kpi mdb-card" },
+      el("div", { className: "name", textContent: name }),
+      el("div", { className: "value" }, value instanceof Node ? value : String(value)),
+      was ? el("div", { className: "was", textContent: was }) : null);
+  }
+
+  function drawKpis(report) {
+    const t = report.totals;
+    const prev = report.changes?.previous_totals;
+    const was = (key, fmt) => (prev && prev[key] !== t[key] ? `last report ${fmt(prev[key])}` : null);
+    at("kpis").replaceChildren(
+      kpi("Spend", amount(t.spend), was("spend", amount)),
+      kpi("Qualified sales", t.sales, was("sales", (v) => v ?? "—")),
+      kpi(`Cost per qualified sale · target ${amount(report.target_cost_per_sale)}`, amount(t.cost_per_sale), was("cost_per_sale", amount)),
+      kpi("Margin after spend", signed(t.margin_after_spend), was("margin_after_spend", amount)),
+    );
+  }
+
+  // Four weekly pairs of bars: spend, and margin (below the line when negative).
+  function weekChart(weeks) {
+    const W = 360, H = 150, top = 8, bottom = 22, left = 4;
+    const values = weeks.flatMap((w) => [num(w.spend), num(w.margin)]);
+    const hi = Math.max(1, ...values), lo = Math.min(0, ...values);
+    const y = (v) => top + ((hi - v) / (hi - lo)) * (H - top - bottom);
+    const chart = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img",
+      "aria-label": "Spend and margin for each of the four weeks" });
+    chart.append(svg("line", { class: "mdb-chart-rule", x1: 0, x2: W, y1: y(0), y2: y(0) }));
+    const slot = (W - left) / weeks.length;
+    weeks.forEach((w, i) => {
+      const x = left + i * slot + slot * 0.18;
+      const bw = slot * 0.3;
+      [["spend", "mdb-chart-s3"], ["margin", "margin-bar"]].forEach(([key, cls], k) => {
+        const v = num(w[key]);
+        const bar = svg("rect", { class: `mdb-chart-bar ${cls}`, x: x + k * (bw + 2), width: bw,
+          y: Math.min(y(v), y(0)), height: Math.max(1, Math.abs(y(v) - y(0))) });
+        const tip = svg("title");
+        tip.textContent = `Week ending ${w.week_ending}: ${key} ${amount(w[key])}${key === "margin" ? `, ${w.sales} qualified sale${w.sales === 1 ? "" : "s"}` : ""}`;
+        bar.append(tip);
+        chart.append(bar);
+      });
+      const label = svg("text", { class: "mdb-chart-tick", x: x + bw + 1, y: H - 6, "text-anchor": "middle" });
+      label.textContent = w.week_ending.slice(5);
+      chart.append(label);
+    });
+    return el("div", { className: "chart" }, chart, el("div", { className: "legend" },
+      el("span", {}, el("i", { style: "background: var(--mdb-text-muted)" }), "Spend"),
+      el("span", {}, el("i", { style: "background: var(--mdb-type-table)" }), "Margin"),
+      el("span", { textContent: "week ending" })));
+  }
+
+  function why(c, report) {
+    const by = c.changed_by ?? [];
+    if (!by.length) return null;
+    const parts = [];
+    if (by.includes("corrected export")) {
+      parts.push(el("span", {}, el("b", { textContent: "A corrected export" }),
+        ` changed the last report's ${WORD[c.previous?.recommendation] ?? "—"} to ${WORD[c.restated?.recommendation] ?? "—"}.`));
+    }
+    if (by.includes("new week")) {
+      const known = c.previous || c.restated;
+      const text = !c.recommendation ? " left it with no activity in this period."
+        : known ? ` moved it to ${WORD[c.recommendation]}.` : " this period.";
+      parts.push(el("span", {}, el("b", { textContent: known ? "The new week" : "New campaign" }), text));
+    }
+    return el("div", { className: "why" }, ...parts.flatMap((p, i) => (i ? [" ", p] : [p])));
+  }
+
+  function detail(c, report) {
+    const lines = [];
+    if (c.previous || c.restated) {
+      const prevEnd = report.changes?.previous_week_ending;
+      lines.push(["Last report", c.previous, `week ending ${prevEnd}, as sent`]);
+      lines.push(["Last report, today's files", c.restated, "the same period with corrections"]);
+    }
+    lines.push(["This report", c, `week ending ${report.week_ending}`]);
+    const t = el("table", { className: "grid" },
+      el("thead", {}, el("tr", {}, ...["", "Recommendation", "Spend", "Sales", "Cost per sale", "Margin after spend"]
+        .map((h, i) => el("th", { className: i > 1 ? "num" : "", textContent: h })))),
+      el("tbody", {}, ...lines.map(([name, m, note]) => el("tr", {},
+        el("td", {}, name, el("div", { className: "why", textContent: note })),
+        el("td", {}, rec(m?.recommendation)),
+        el("td", { className: "num", textContent: m ? amount(m.spend) : "—" }),
+        el("td", { className: "num", textContent: m ? m.sales : "—" }),
+        el("td", { className: "num", textContent: m ? amount(m.cost_per_sale) : "—" }),
+        el("td", { className: "num" }, m ? signed(m.margin_after_spend) : "—")))));
+    return el("div", { className: "detail-body" }, weekChart(c.weeks), el("div", { className: "scroll" }, t, why(c, report)));
+  }
+
+  function drawActions(report) {
+    const host = at("actions");
+    const rows = report.campaigns;
+    const open = new Set();
+    let filter = "all";
+    const FILTERS = [
+      ["all", "All", () => true],
+      ["changed", "Changed", changed],
+      ["scale", "Scale", (c) => c.recommendation === "scale"],
+      ["hold", "Hold", (c) => c.recommendation === "hold"],
+      ["cut", "Cut", (c) => c.recommendation === "cut"],
+    ];
+    const chips = el("div", { className: "chips", role: "group", ariaLabel: "Show campaigns" });
+    const wrap = el("div", { className: "scroll" });
+    const cols = [
+      { key: "campaign", label: "Campaign", cell: (c) => el("button", {
+          className: "open", type: "button", textContent: c.campaign,
+          ariaExpanded: String(open.has(c.campaign)),
+          title: "Show the four weeks and the last report",
+          onclick: () => { open.has(c.campaign) ? open.delete(c.campaign) : open.add(c.campaign); table.draw(); },
+        }) },
+      { key: "recommendation", label: "Action", value: (c) => ORDER[c.recommendation],
+        cell: (c) => el("div", {}, rec(c.recommendation), changed(c)
+          ? el("div", { className: "why", textContent: `was ${WORD[c.previous?.recommendation] ?? "not in the last report"}` }) : null) },
+      { key: "spend", label: "Spend", num: true, value: (c) => num(c.spend), cell: (c) => amount(c.spend) },
+      { key: "sales", label: "Qualified sales", num: true },
+      { key: "cost_per_sale", label: "Cost per sale", num: true, value: (c) => num(c.cost_per_sale), cell: (c) => amount(c.cost_per_sale) },
+      { key: "margin_after_spend", label: "Margin after spend", num: true, value: (c) => num(c.margin_after_spend), cell: (c) => signed(c.margin_after_spend) },
+    ];
+    let table;
+    const draw = () => {
+      const keep = FILTERS.find(([k]) => k === filter)[2];
+      chips.replaceChildren(...FILTERS.map(([key, label, test]) => el("button", {
+        className: "chip", type: "button", ariaPressed: String(filter === key),
+        onclick: () => { filter = key; draw(); },
+      }, label, el("span", { className: "n", textContent: rows.filter(test).length }))));
+      table = sortable(cols, rows.filter(keep), {
+        initial: { key: "recommendation", dir: 1 },
+        after: (c, tr, body, span) => {
+          if (open.has(c.campaign)) body.append(el("tr", { className: "detail" }, el("td", { colSpan: span }, detail(c, report))));
+        },
+      });
+      wrap.replaceChildren(rows.filter(keep).length ? table.table
+        : el("p", { className: "muted", textContent: "No campaign matches this filter." }));
+    };
+    draw();
+    host.replaceChildren(chips, wrap);
+  }
+
+  function drawChanges(report) {
+    const ch = report.changes;
+    const host = at("changes");
+    if (!ch) {
+      host.replaceChildren(el("p", { className: "muted",
+        textContent: "No last report to compare with. Put last week's report in the client's folder as previous-report.json." }));
+      return;
+    }
+    const moved = report.campaigns.filter(changed);
+    const byFix = moved.filter((c) => c.changed_by.includes("corrected export"));
+    const list = (title, names) => (names.length
+      ? el("div", { className: "mdb-card" }, el("div", { className: "why", textContent: title }),
+          el("ul", { className: "plain" }, ...names.map((n) => el("li", { textContent: n }))))
+      : null);
+    const t = (x) => (x ? signed(x.margin_after_spend) : "—");
+    host.replaceChildren(
+      el("p", {}, `Compared with the report for the week ending ${ch.previous_week_ending}. `,
+        moved.length ? `${moved.length} campaign${moved.length === 1 ? "" : "s"} changed action` : "No campaign changed action",
+        byFix.length ? `; ${byFix.map((c) => c.campaign).join(", ")} because of a corrected export.` : "."),
+      el("div", { className: "three" },
+        kpi("Margin after spend, last report", t(ch.previous_totals)),
+        kpi("Same period, today's files", t(ch.restated_totals)),
+        kpi("This report", signed(report.totals.margin_after_spend))),
+      el("div", { className: "three" },
+        list("Corrected since the last report", ch.changed),
+        list("New exports", ch.added),
+        list("No longer in the folder", ch.removed)),
+    );
+  }
+
+  function drawReview(report) {
+    const rows = report.review;
+    if (!rows.length) {
+      at("review").replaceChildren(el("p", { className: "ok", textContent: "Nothing to review." }));
+      return;
+    }
+    const { table } = sortable([
+      { key: "file", label: "File", value: (r) => r.file ?? "", cell: (r) => r.file ?? "Whole period" },
+      { key: "row", label: "Row", num: true },
+      { key: "problem", label: "Problem" },
+    ], rows);
+    at("review").replaceChildren(
+      el("p", { textContent: `${rows.length} item${rows.length === 1 ? "" : "s"}. Each says what happened to it; a row that can't be read is left out of every figure.` }),
+      el("div", { className: "scroll" }, table));
+  }
+
+  function drawFiles(report) {
+    const totals = (f) => Object.entries(f.totals).map(([cur, v]) => `${cur} ${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`).join(", ");
+    const { table } = sortable([
+      { key: "file", label: "File" },
+      { key: "source", label: "Source", cell: (f) => f.source ?? el("span", { className: "neg", textContent: "not matched" }) },
+      { key: "rows", label: "Rows read", num: true },
+      { key: "first", label: "Dates", cell: (f) => (f.first ? `${f.first} – ${f.last}` : "—") },
+      { key: "totals", label: "Total of rows read", num: true, cell: totals,
+        // By currency, then amount; a file in two currencies sorts by its first.
+        value: (f) => { const [cur, v] = Object.entries(f.totals)[0] ?? []; return cur == null ? null : [cur, Number(v)]; } },
+    ], report.files);
+    at("files").replaceChildren(
+      el("p", { className: "muted", textContent: "Each export's total of the rows that could be read, in its own currency. With the rows listed under Needs a look, it ties to the tool it came from." }),
+      el("div", { className: "scroll" }, table));
+  }
+
+  async function drawWork(withheld) {
+    const host = at("work");
+    if (withheld) {
+      host.replaceChildren(el("p", { className: "mdb-absent", textContent: "No run details in this copy (--no-values)." }));
+      return;
+    }
+    try {
+      const { run } = mdb.resolved("report.report");
+      if (!run) throw new Error("no run has answered yet");
+      const record = await mdb.run(run);
+      const leaves = record.blocks.filter((b) => !b.kind);
+      const name = (b) => (b.instance?.label ? `${b.block} · ${b.instance.label}` : b.block);
+      const ran = leaves.filter((b) => b.status === "finished");
+      const failed = leaves.filter((b) => b.status === "failed");
+      const cached = leaves.filter((b) => b.status === "cache_hit");
+      const ms = (b) => el("span", { className: "muted", textContent: b.duration_ms != null ? ` · ${b.duration_ms} ms` : "" });
+      host.replaceChildren(...[
+        el("p", {}, `${ran.length} step${ran.length === 1 ? "" : "s"} ran, ${cached.length} came from cache`,
+          failed.length ? el("span", { className: "neg", textContent: `, ${failed.length} failed` }) : null, ". ",
+          el("span", { className: "muted", textContent: "collect reads the folder every run; every other step reruns only when its inputs change." })),
+        failed.length ? el("div", { className: "mdb-card" }, el("div", { className: "why", textContent: "Failed in this run" }),
+          el("ul", { className: "plain" }, ...failed.map((b) => el("li", { className: "neg" }, name(b), ms(b))))) : null,
+        ran.length ? el("div", { className: "mdb-card" }, el("div", { className: "why", textContent: "Ran in this run" }),
+          el("ul", { className: "plain" }, ...ran.map((b) => el("li", {}, name(b), ms(b))))) : null,
+      ].filter(Boolean));
+    } catch (err) {
+      host.replaceChildren(el("p", { className: "mdb-absent", textContent: `Run details aren't available: ${err.message}` }));
+    }
+  }
+
+  async function draw() {
+    const { manifest } = mdb;
+    const withheld = mdb.entry("report.report").reason === "--no-values";
+    let report = null;
+    try {
+      report = await mdb.value("report.report");
+    } catch (err) {
+      for (const id of ["kpis", "actions", "changes", "review", "files"]) absent(at(id), "report.report", err);
+    }
+    if (report) {
+      money = (v) => new Intl.NumberFormat(undefined, {
+        style: "currency", currency: report.currency, minimumFractionDigits: 2, maximumFractionDigits: 2,
+      }).format(v);
+      at("title").textContent = `${report.client} · week ending ${report.week_ending}`;
+      document.title = `${report.client} — ${report.week_ending}`;
+    }
+    at("page").textContent = withheld ? "No recorded values in this copy" : [
+      report ? `${report.period_start} to ${report.week_ending} · ${report.currency}` : null,
+      `${manifest.runs.length} run${manifest.runs.length === 1 ? "" : "s"}`,
+      manifest.asOf ? `as of ${manifest.asOf}` : "never run",
+    ].filter(Boolean).join(" · ");
+    if (report) {
+      drawKpis(report);
+      drawActions(report);
+      drawChanges(report);
+      drawReview(report);
+      drawFiles(report);
+    }
+    await Promise.all([mdb.bind(), drawWork(withheld)]);
+  }
+
+  // A finished run reloads the page, so every draw starts from a fresh page.
+  try {
+    await mdb.ready();
+    mdb.on("change", () => location.reload());
+    await mdb.ready(); // again, now subscribed, so a run that finished meanwhile is drawn
+  } catch (err) {
+    at("page").textContent = `Can't read the runs: ${err.message}. Reload to try again.`;
+    throw err;
+  }
+  await draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# A sources.json setting of the wrong shape stops the run, naming it: here `won` is one
+# string, not a list of stage names.
+mdblocks: 1
+given:
+  files: []
+  sources:
+    crm: {kind: leads, columns: {lead: Lead, date: Created, campaign: Campaign, stage: Stage, deal: Deal}, won: Closed Won, date_format: "%Y-%m-%d"}
+  client: {name: Test Co, currency: USD, target_cost_per_sale: "100.00"}
+  previous: null
+params:
+  week_ending: "2026-11-28"
+expect_state: failed
+expect_error: harness_error

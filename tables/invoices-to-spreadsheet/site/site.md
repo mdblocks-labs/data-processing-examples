@@ -1,6 +1,5 @@
 ---
 mdblocks: 1
-type: mdblocks/site
 title: Invoices from a folder
 reads:
   - assemble.invoices

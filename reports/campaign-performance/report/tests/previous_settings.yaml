@@ -1,0 +1,215 @@
+# A previous report made under another client.json or sources.json (here a won stage
+# renamed) is listed and not compared: the change would read as a corrected export.
+mdblocks: 1
+given:
+  files:
+  - - file: google-1.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-02', Brand, '100.00', USD]
+      - ['2026-11-10', Boots, '150.00', USD]
+      error: null
+  - - file: google-2.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      header: [Day, Campaign, Cost, Currency]
+      rows:
+      - ['2026-11-28', Brand, '40.00', USD]
+      - ['2026-12-05', Brand, '40.00', USD]
+      - ['2026-12-05', Boots, '10.00', USD]
+      error: null
+  - - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Lead, Created, Campaign, Stage, Deal]
+      rows:
+      - [L1, '2026-11-01', Brand, Won, D1]
+      - [L2, '2026-11-01', Boots, Won, D2]
+      - [L3, '2026-11-25', Boots, Won, D3]
+      error: null
+  - - file: sales-1.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O1, D1, '2026-11-05', '200.00', '100.00', '0.00', USD]
+      - [O2, D2, '2026-11-12', '400.00', '100.00', '0.00', USD]
+      error: null
+  - - file: sales-2.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      header: [Order, Deal, Date, Revenue, Cost of goods, Refund, Currency]
+      rows:
+      - [O3, D3, '2026-11-27', '100.00', '20.00', '0.00', USD]
+      - [O4, D1, '2026-12-04', '200.00', '100.00', '0.00', USD]
+      error: null
+  - - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      header: [date, currency, rate]
+      rows:
+      - ['2026-11-01', EUR, '1.10']
+      - ['2026-11-10', EUR, '1.20']
+      error: null
+  sources: '@sources.json'
+  client:
+    name: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+  previous: "{\n  \"client\": \"Test Co\",\n  \"currency\": \"USD\",\n  \"target_cost_per_sale\": \"100.00\",\n  \"settings\"\
+    : \"e21f3539709604db7d0b8c9e567be79f246db1ee1bff30881c04022a6d40dd34\",\n  \"week_ending\": \"2026-11-28\",\n  \"period_start\"\
+    : \"2026-11-01\",\n  \"totals\": {\n    \"spend\": \"290.00\",\n    \"sales\": 0,\n    \"cost_per_sale\": null,\n    \"\
+    margin\": \"0.00\",\n    \"margin_after_spend\": \"-290.00\",\n    \"unattributed_margin\": \"480.00\"\n  },\n  \"campaigns\"\
+    : [\n    {\n      \"campaign\": \"Boots\",\n      \"spend\": \"150.00\",\n      \"sales\": 0,\n      \"cost_per_sale\"\
+    : null,\n      \"margin\": \"0.00\",\n      \"margin_after_spend\": \"-150.00\",\n      \"recommendation\": \"cut\",\n\
+    \      \"weeks\": [\n        {\n          \"week_ending\": \"2026-11-07\",\n          \"spend\": \"0.00\",\n         \
+    \ \"sales\": 0,\n          \"margin\": \"0.00\"\n        },\n        {\n          \"week_ending\": \"2026-11-14\",\n \
+    \         \"spend\": \"150.00\",\n          \"sales\": 0,\n          \"margin\": \"0.00\"\n        },\n        {\n   \
+    \       \"week_ending\": \"2026-11-21\",\n          \"spend\": \"0.00\",\n          \"sales\": 0,\n          \"margin\"\
+    : \"0.00\"\n        },\n        {\n          \"week_ending\": \"2026-11-28\",\n          \"spend\": \"0.00\",\n      \
+    \    \"sales\": 0,\n          \"margin\": \"0.00\"\n        }\n      ]\n    },\n    {\n      \"campaign\": \"Brand\",\n\
+    \      \"spend\": \"140.00\",\n      \"sales\": 0,\n      \"cost_per_sale\": null,\n      \"margin\": \"0.00\",\n    \
+    \  \"margin_after_spend\": \"-140.00\",\n      \"recommendation\": \"cut\",\n      \"weeks\": [\n        {\n         \
+    \ \"week_ending\": \"2026-11-07\",\n          \"spend\": \"100.00\",\n          \"sales\": 0,\n          \"margin\": \"\
+    0.00\"\n        },\n        {\n          \"week_ending\": \"2026-11-14\",\n          \"spend\": \"0.00\",\n          \"\
+    sales\": 0,\n          \"margin\": \"0.00\"\n        },\n        {\n          \"week_ending\": \"2026-11-21\",\n     \
+    \     \"spend\": \"0.00\",\n          \"sales\": 0,\n          \"margin\": \"0.00\"\n        },\n        {\n         \
+    \ \"week_ending\": \"2026-11-28\",\n          \"spend\": \"40.00\",\n          \"sales\": 0,\n          \"margin\": \"\
+    0.00\"\n        }\n      ]\n    }\n  ],\n  \"files\": [\n    {\n      \"file\": \"crm.csv\",\n      \"sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\
+    ,\n      \"source\": \"crm\",\n      \"rows\": 3,\n      \"first\": \"2026-11-01\",\n      \"last\": \"2026-11-25\",\n\
+    \      \"totals\": {}\n    },\n    {\n      \"file\": \"google-1.csv\",\n      \"sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\
+    ,\n      \"source\": \"google\",\n      \"rows\": 2,\n      \"first\": \"2026-11-02\",\n      \"last\": \"2026-11-10\"\
+    ,\n      \"totals\": {\n        \"USD\": \"250.00\"\n      }\n    },\n    {\n      \"file\": \"google-2.csv\",\n     \
+    \ \"sha256\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n      \"source\": \"google\",\n \
+    \     \"rows\": 3,\n      \"first\": \"2026-11-28\",\n      \"last\": \"2026-12-05\",\n      \"totals\": {\n        \"\
+    USD\": \"90.00\"\n      }\n    },\n    {\n      \"file\": \"rates.csv\",\n      \"sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\
+    ,\n      \"source\": \"rates\",\n      \"rows\": 2,\n      \"first\": \"2026-11-01\",\n      \"last\": \"2026-11-10\"\
+    ,\n      \"totals\": {}\n    },\n    {\n      \"file\": \"sales-1.csv\",\n      \"sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\
+    ,\n      \"source\": \"sales\",\n      \"rows\": 2,\n      \"first\": \"2026-11-05\",\n      \"last\": \"2026-11-12\"\
+    ,\n      \"totals\": {\n        \"USD\": \"600.00\"\n      }\n    },\n    {\n      \"file\": \"sales-2.csv\",\n      \"\
+    sha256\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n      \"source\": \"sales\",\n      \"\
+    rows\": 2,\n      \"first\": \"2026-11-27\",\n      \"last\": \"2026-12-04\",\n      \"totals\": {\n        \"USD\": \"\
+    300.00\"\n      }\n    }\n  ],\n  \"changes\": null,\n  \"review\": [\n    {\n      \"file\": null,\n      \"row\": null,\n\
+    \      \"problem\": \"meta: no file in the folder matches its headers\"\n    }\n  ],\n  \"checksum\": \"ad2302c8a7fd79358b69b759bf3141ec9e9e6a6214eb99745ac937a76611a6c3\"\
+    \n}"
+params:
+  week_ending: '2026-12-05'
+expect:
+  report:
+    client: Test Co
+    currency: USD
+    target_cost_per_sale: '100.00'
+    settings: 807d6d9a9eb18647c2a1d917c3a42e681ad2e0741430639b466a06570bdc353a
+    week_ending: '2026-12-05'
+    period_start: '2026-11-08'
+    totals:
+      spend: '240.00'
+      sales: 3
+      cost_per_sale: '80.00'
+      margin: '480.00'
+      margin_after_spend: '240.00'
+      unattributed_margin: '0.00'
+    campaigns:
+    - campaign: Boots
+      spend: '160.00'
+      sales: 2
+      cost_per_sale: '80.00'
+      margin: '380.00'
+      margin_after_spend: '220.00'
+      recommendation: scale
+      weeks:
+      - week_ending: '2026-11-14'
+        spend: '150.00'
+        sales: 1
+        margin: '300.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '0.00'
+        sales: 1
+        margin: '80.00'
+      - week_ending: '2026-12-05'
+        spend: '10.00'
+        sales: 0
+        margin: '0.00'
+    - campaign: Brand
+      spend: '80.00'
+      sales: 1
+      cost_per_sale: '80.00'
+      margin: '100.00'
+      margin_after_spend: '20.00'
+      recommendation: scale
+      weeks:
+      - week_ending: '2026-11-14'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-21'
+        spend: '0.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-11-28'
+        spend: '40.00'
+        sales: 0
+        margin: '0.00'
+      - week_ending: '2026-12-05'
+        spend: '40.00'
+        sales: 1
+        margin: '100.00'
+    files:
+    - file: crm.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: crm
+      rows: 3
+      first: '2026-11-01'
+      last: '2026-11-25'
+      totals: {}
+    - file: google-1.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: google
+      rows: 2
+      first: '2026-11-02'
+      last: '2026-11-10'
+      totals:
+        USD: '250.00'
+    - file: google-2.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      source: google
+      rows: 3
+      first: '2026-11-28'
+      last: '2026-12-05'
+      totals:
+        USD: '90.00'
+    - file: rates.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: rates
+      rows: 2
+      first: '2026-11-01'
+      last: '2026-11-10'
+      totals: {}
+    - file: sales-1.csv
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      source: sales
+      rows: 2
+      first: '2026-11-05'
+      last: '2026-11-12'
+      totals:
+        USD: '600.00'
+    - file: sales-2.csv
+      sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      source: sales
+      rows: 2
+      first: '2026-11-27'
+      last: '2026-12-04'
+      totals:
+        USD: '300.00'
+    changes: null
+    review:
+    - file: null
+      row: null
+      problem: 'crm: no rows in the week ending 2026-12-05'
+    - file: null
+      row: null
+      problem: 'meta: no file in the folder matches its headers'
+    - file: previous-report.json
+      row: null
+      problem: was made with other settings in client.json or sources.json; not compared
+    checksum: 895cf5f07f168912887da5f62b1c78605703896e496439a0d7f10d4b0a955ff9
