@@ -1,12 +1,12 @@
 ---
 mdblocks: 1
-name: Example mdBlocks workflows for data processing
+name: Data processing examples
 description: Invoices read into tables, payouts reconciled against bank deposits, and a weekly campaign report, from your own files on your own machine.
 license: MIT
 field: Data processing / Tables / Extraction
 ---
 
-# Example mdBlocks workflows for data processing
+# Data processing examples
 
 Each example is one workflow you can run, read and copy, in its domain's folder.
 
