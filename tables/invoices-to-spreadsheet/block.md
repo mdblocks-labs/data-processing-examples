@@ -14,6 +14,8 @@ params:
     dtype: string
     default: "samples/invoices"
 card:
+  usage:
+    - workflow
   field: Data processing / Tables / Extraction
 ---
 

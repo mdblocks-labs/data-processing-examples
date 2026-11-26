@@ -16,6 +16,8 @@ params:
     dtype: string
     default: "samples/period-2"
 card:
+  usage:
+    - workflow
   field: Data processing / Tables / Reconciliation
 ---
 

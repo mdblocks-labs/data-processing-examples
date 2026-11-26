@@ -14,6 +14,8 @@ params:
     dtype: string
     default: "2026-11-22"
 card:
+  usage:
+    - workflow
   field: Data processing / Reports / Dashboards
 ---
 
