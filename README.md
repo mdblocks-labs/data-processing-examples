@@ -27,6 +27,9 @@ mdb data init approved_totals --empty
 mdb run . --preset presets/period-1.yaml
 ```
 
+In your own project, copy it to a folder at the project's top level, in a project whose
+root folder has no `block.md`, and run the same two commands inside the copy.
+
 The samples are invented. Each workflow's `block.md` explains what it does, what it
 promises and how to use your own files.
 
